@@ -22,7 +22,18 @@ ecom-scraper/
 └── frontend/   Next.js interface
 ```
 
-## Quick start
+## Easiest way: double-click
+
+1. Install [Python](https://www.python.org/downloads/) (on Windows, tick **"Add Python to PATH"**)
+   and [Node.js](https://nodejs.org/) (LTS). You only do this once.
+2. Double-click **`Start (Mac).command`** or **`Start (Windows).bat`** in this folder.
+   - The first time, it installs everything (a few minutes).
+   - Your browser opens the scraper at http://localhost:3000 by itself.
+3. Keep the black window open while you use it. Close it to stop.
+
+On a Mac, if it says the file "can't be opened", right-click it, choose **Open**, then click **Open** again.
+
+## Manual start
 
 You need Python 3.10+ and Node.js 18.18+.
 
