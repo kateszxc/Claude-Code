@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#">
+        <span class="brand-mark">IB</span>
+        <span class="brand-name">Invoice Builder</span>
+      </a>
+      <nav class="topnav">
+        <a href="#help">Help</a>
+        <a href="#" id="nav-history">History</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ============ Invoice paper ============ -->
+    <section class="paper" id="invoice">
+
+      <div class="row top">
+        <div class="col-left">
+          <label class="logo-box" id="logo-box">
+            <input type="file" id="logo-input" accept="image/*" hidden>
+            <img id="logo-img" alt="" hidden>
+            <span class="logo-placeholder" id="logo-placeholder">+ Add Your Logo</span>
+            <button type="button" class="logo-remove" id="logo-remove" title="Remove logo" hidden>&times;</button>
+          </label>
+
+          <textarea class="field from" data-key="from" rows="2" placeholder="Who is this from?"></textarea>
+
+          <div class="parties">
+            <div class="party">
+              <input class="label-input" data-key="labels.billTo" value="Bill To">
+              <textarea class="field" data-key="billTo" rows="2" placeholder="Who is this to?"></textarea>
+            </div>
+            <div class="party">
+              <input class="label-input" data-key="labels.shipTo" value="Ship To">
+              <textarea class="field" data-key="shipTo" rows="2" placeholder="(optional)"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <input class="title-input" data-key="labels.title" value="INVOICE">
+          <div class="number-wrap">
+            <span class="hash">#</span>
+            <input class="field number" data-key="number" value="1">
+          </div>
+
+          <div class="meta">
+            <div class="meta-row">
+              <input class="label-input right" data-key="labels.date" value="Date">
+              <input class="field" type="date" data-key="date">
+            </div>
+            <div class="meta-row">
+              <input class="label-input right" data-key="labels.terms" value="Payment Terms">
+              <input class="field" data-key="paymentTerms" placeholder="">
+            </div>
+            <div class="meta-row">
+              <input class="label-input right" data-key="labels.dueDate" value="Due Date">
+              <input class="field" type="date" data-key="dueDate">
+            </div>
+            <div class="meta-row">
+              <input class="label-input right" data-key="labels.po" value="PO Number">
+              <input class="field" data-key="poNumber" placeholder="">
+            </div>
+          </div>
+
+          <div class="balance-box">
+            <input class="label-input right" data-key="labels.balanceDue" value="Balance Due">
+            <span class="balance-amount" data-out="balance">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line items -->
+      <div class="items">
+        <div class="items-head">
+          <input class="label-input inv" data-key="labels.item" value="Item">
+          <input class="label-input inv right" data-key="labels.qty" value="Quantity">
+          <input class="label-input inv right" data-key="labels.rate" value="Rate">
+          <input class="label-input inv right" data-key="labels.amount" value="Amount">
+          <span></span>
+        </div>
+        <div id="items-body"></div>
+        <button type="button" class="btn-add" id="add-item">+ Line Item</button>
+      </div>
+
+      <div class="row bottom">
+        <div class="col-left">
+          <div class="block">
+            <input class="label-input" data-key="labels.notes" value="Notes">
+            <textarea class="field" data-key="notes" rows="3" placeholder="Notes - any relevant information not already covered"></textarea>
+          </div>
+          <div class="block">
+            <input class="label-input" data-key="labels.termsBlock" value="Terms">
+            <textarea class="field" data-key="terms" rows="3" placeholder="Terms and conditions - late fees, payment methods, delivery schedule"></textarea>
+          </div>
+        </div>
+
+        <div class="col-right totals">
+          <div class="total-row">
+            <input class="label-input right" data-key="labels.subtotal" value="Subtotal">
+            <span class="total-value" data-out="subtotal">$0.00</span>
+          </div>
+
+          <div class="total-row adj" data-adj="discount" hidden>
+            <input class="label-input right" data-key="labels.discount" value="Discount">
+            <div class="adj-input">
+              <span class="adj-prefix" data-prefix="discount"></span>
+              <input class="field num" type="number" step="any" data-key="discount.value" value="0">
+              <span class="adj-suffix" data-suffix="discount"></span>
+              <button type="button" class="toggle-type" data-toggle="discount" title="Switch % / flat">&#8646;</button>
+              <button type="button" class="remove-adj" data-remove="discount" title="Remove">&times;</button>
+            </div>
+          </div>
+
+          <div class="total-row adj" data-adj="tax">
+            <input class="label-input right" data-key="labels.tax" value="Tax">
+            <div class="adj-input">
+              <span class="adj-prefix" data-prefix="tax"></span>
+              <input class="field num" type="number" step="any" data-key="tax.value" value="0">
+              <span class="adj-suffix" data-suffix="tax"></span>
+              <button type="button" class="toggle-type" data-toggle="tax" title="Switch % / flat">&#8646;</button>
+              <button type="button" class="remove-adj" data-remove="tax" title="Remove">&times;</button>
+            </div>
+          </div>
+
+          <div class="total-row adj" data-adj="shipping" hidden>
+            <input class="label-input right" data-key="labels.shipping" value="Shipping">
+            <div class="adj-input">
+              <span class="adj-prefix" data-prefix="shipping"></span>
+              <input class="field num" type="number" step="any" data-key="shipping.value" value="0">
+              <span class="adj-suffix" data-suffix="shipping"></span>
+              <button type="button" class="remove-adj" data-remove="shipping" title="Remove">&times;</button>
+            </div>
+          </div>
+
+          <div class="adj-links">
+            <button type="button" class="link" data-add="discount">+ Discount</button>
+            <button type="button" class="link" data-add="tax" hidden>+ Tax</button>
+            <button type="button" class="link" data-add="shipping">+ Shipping</button>
+          </div>
+
+          <div class="total-row">
+            <input class="label-input right" data-key="labels.total" value="Total">
+            <span class="total-value" data-out="total">$0.00</span>
+          </div>
+
+          <div class="total-row">
+            <input class="label-input right" data-key="labels.amountPaid" value="Amount Paid">
+            <div class="adj-input">
+              <span class="adj-prefix" data-prefix="paid"></span>
+              <input class="field num" type="number" step="any" data-key="amountPaid" value="0">
+            </div>
+          </div>
+
+          <div class="total-row strong">
+            <input class="label-input right" data-key="labels.balanceDue2" value="Balance Due">
+            <span class="total-value" data-out="balance">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Sidebar ============ -->
+    <aside class="sidebar">
+      <button type="button" class="btn-primary" id="download">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5z"/></svg>
+        Download Invoice
+      </button>
+      <p class="hint">Opens your browser's print dialog. Choose "Save as PDF".</p>
+
+      <div class="side-group">
+        <label for="currency">Currency</label>
+        <select id="currency"></select>
+      </div>
+
+      <div class="side-group">
+        <button type="button" class="btn-secondary" id="save-default">Save Default</button>
+        <button type="button" class="btn-secondary" id="new-invoice">New Invoice</button>
+      </div>
+
+      <p class="saved-note" id="saved-note" aria-live="polite"></p>
+    </aside>
+  </main>
+
+  <!-- ============ Help ============ -->
+  <section class="help" id="help">
+    <h2>Invoice Template</h2>
+    <p>Fill in the fields above and download a print-ready PDF. Everything you type stays in your browser and is saved automatically, so you can close the tab and pick up where you left off.</p>
+
+    <div class="help-grid">
+      <div>
+        <h3>Editable labels</h3>
+        <p>Every label, including "Bill To", "Quantity" and "Balance Due", can be renamed by clicking on it. Use this for quotes, receipts or a language other than English.</p>
+      </div>
+      <div>
+        <h3>Taxes, discounts and shipping</h3>
+        <p>Add a discount or shipping charge with the links under the subtotal. Tax and discount switch between a percentage and a flat amount with the &#8646; button.</p>
+      </div>
+      <div>
+        <h3>Defaults</h3>
+        <p>"Save Default" remembers your sender details, logo, notes, terms and currency. "New Invoice" starts a blank invoice with those defaults and the next invoice number.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Invoice Builder &middot; runs entirely in your browser</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
