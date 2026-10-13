@@ -6,6 +6,25 @@ title E-com Brand Scraper
 set URL=http://localhost:3000
 echo === E-com Brand Scraper ===
 
+REM This file must sit inside the ecom-scraper folder, next to "backend" and "frontend".
+if not exist "backend\requirements.txt" (
+  if exist "ecom-scraper\backend\requirements.txt" (
+    cd ecom-scraper
+  ) else (
+    echo.
+    echo This file needs the rest of the scraper files next to it.
+    echo.
+    echo 1. On the page that just opened, switch the branch to scraper-test,
+    echo    then click Code, then Download ZIP.
+    echo 2. Right-click the ZIP and choose Extract All.
+    echo 3. Open the extracted folder, then the ecom-scraper folder,
+    echo    and double-click "Start (Windows).bat" there.
+    start "" https://github.com/kateszxc/Claude-Code
+    pause
+    exit /b 1
+  )
+)
+
 python --version >nul 2>&1
 if errorlevel 1 (
   echo.
