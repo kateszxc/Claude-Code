@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import AsyncIterator
+from datetime import date
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -67,22 +68,40 @@ def build_queries(req: ScrapeRequest) -> tuple[list[str], list[str]]:
     """Return (store_queries, roundup_queries)."""
     niche = req.niche_label if req.niche_label != req.niche else req.niche
     extra = " ".join(w.strip() for w in req.keywords.split(",") if w.strip())
-    where = f" {req.country}" if req.country else ""
     topic = f"{extra} {niche}".strip()
+    place = req.location_label
+    year = date.today().year
+    if place:
+        store = [
+            f"{topic} brand based in {place} online store",
+            f'{topic} shop {place} "add to cart"',
+            f'{topic} "made in {req.city or req.state or req.country}" shop online',
+            f'{topic} brand {place} "powered by shopify"',
+            f"small {topic} business {place} shop online",
+        ]
+        roundup = [
+            f"best {topic} brands in {place}",
+            f"{place} {topic} brands to shop",
+            f"local {topic} brands {place}",
+            f"small {topic} businesses in {place} to support",
+            f"best {topic} brands from {req.state or req.country or place} {year}",
+            f"black-owned OR women-owned {topic} brands {place}",
+        ]
+        return store, roundup
     store = [
-        f"{topic} brand official online store{where}",
-        f'{topic} shop "free shipping" "add to cart"{where}',
-        f'{topic} "powered by shopify"{where}',
-        f"independent {topic} brand shop online{where}",
-        f"small {topic} business online shop{where}",
+        f"{topic} brand official online store",
+        f'{topic} shop "free shipping" "add to cart"',
+        f'{topic} "powered by shopify"',
+        f"independent {topic} brand shop online",
+        f"small {topic} business online shop",
     ]
     roundup = [
-        f"best {topic} DTC brands{where}",
-        f"best independent {topic} brands to shop{where}",
-        f"{topic} brands you should know{where}",
-        f"small {topic} brands to support{where}",
-        f"emerging {topic} brands{where} 2026",
-        f"black-owned OR women-owned {topic} brands{where}",
+        f"best {topic} DTC brands",
+        f"best independent {topic} brands to shop",
+        f"{topic} brands you should know",
+        f"small {topic} brands to support",
+        f"emerging {topic} brands {year}",
+        f"black-owned OR women-owned {topic} brands",
     ]
     return store, roundup
 

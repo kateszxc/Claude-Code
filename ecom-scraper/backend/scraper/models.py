@@ -75,24 +75,6 @@ NICHES: dict[str, dict] = {
     },
 }
 
-RevenueBand = Literal["under_1m", "1m_5m", "5m_20m", "20m_plus"]
-REVENUE_BANDS: dict[str, str] = {
-    "under_1m": "Under $1M / yr",
-    "1m_5m": "$1M – $5M / yr",
-    "5m_20m": "$5M – $20M / yr",
-    "20m_plus": "$20M+ / yr",
-}
-
-FundingFilter = Literal["any", "bootstrapped", "pre_seed_seed", "series_a_plus", "funded_any"]
-FUNDING_FILTERS: dict[str, str] = {
-    "any": "Any funding status",
-    "bootstrapped": "Bootstrapped / no public funding",
-    "pre_seed_seed": "Pre-seed or Seed",
-    "series_a_plus": "Series A or later",
-    "funded_any": "Any disclosed funding",
-}
-
-
 # ---------------------------------------------------------------------------
 # Request / result models
 # ---------------------------------------------------------------------------
@@ -102,14 +84,17 @@ class ScrapeRequest(BaseModel):
     count: int = Field(10, ge=1, le=200, description="How many matching brands to return")
     niche: str = Field("beauty-skincare", description="Preset niche id or free-text niche")
     keywords: str = Field("", description="Extra keywords to narrow the search, e.g. 'vegan, clean'")
-    country: str = Field("", description="Optional country / market, e.g. 'US', 'UK', 'Australia'")
-    revenue_bands: list[RevenueBand] = Field(default_factory=list, description="Empty = any revenue")
+    country: str = Field("", description="Optional country, e.g. 'United States'")
+    state: str = Field("", description="Optional state / province / region, e.g. 'California'")
+    city: str = Field("", description="Optional city, e.g. 'Los Angeles'")
+    location_required: bool = Field(
+        False, description="Only keep brands whose website confirms the chosen location"
+    )
     min_age_years: float | None = Field(None, ge=0)
     max_age_years: float | None = Field(None, ge=0)
-    funding: FundingFilter = "any"
     seed_urls: list[str] = Field(default_factory=list, description="Optional brand URLs to include")
     strict_filters: bool = Field(
-        False, description="Drop brands whose age/funding can't be determined instead of keeping them"
+        False, description="Drop brands whose age can't be determined instead of keeping them"
     )
     use_ai: bool = Field(True, description="Use Claude for summaries + ideas when an API key is configured")
 
@@ -117,6 +102,10 @@ class ScrapeRequest(BaseModel):
     @classmethod
     def _clean_urls(cls, v: list[str]) -> list[str]:
         return [u.strip() for u in v if u and u.strip()][:500]
+
+    @property
+    def location_label(self) -> str:
+        return ", ".join(p.strip() for p in (self.city, self.state, self.country) if p and p.strip())
 
     @property
     def niche_label(self) -> str:
@@ -143,13 +132,11 @@ class BrandResult(BaseModel):
     email_confidence: str = ""  # verified / high / medium / low / none
     email_source: str = ""
     other_emails: list[str] = Field(default_factory=list)
-    est_revenue_band: str = ""
-    revenue_basis: str = ""
+    location: str = ""  # where the brand says it's based
+    location_match: str = ""  # confirmed / not confirmed / "" (no location chosen)
     brand_age_years: float | None = None
     founded_year: int | None = None
     age_source: str = ""
-    funding_status: str = ""
-    funding_details: str = ""
     product_count: str = ""
     price_range: str = ""
     avg_price: float | None = None

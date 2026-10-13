@@ -7,14 +7,14 @@ Finds **e-commerce brands** in a niche you choose and exports a CSV with, for ea
 | Basics | Brand name, domain, website, platform (Shopify, WooCommerce, …) |
 | What they're about | Summary from their About / Our Story page (or written by Claude if enabled) |
 | Founder | Founder name + best email, with a confidence level (`verified`, `high`, `medium`, `low`) and the page it came from, plus other emails found |
-| Targeting | Estimated revenue band, brand age (and how it was determined), funding status/details |
+| Location & age | Where the brand says it's based, whether that matches the location you picked, and brand age (with how it was determined) |
 | Store data | Product count, price range, average price (from Shopify's public catalog) |
 | Socials | Instagram, TikTok, Facebook, YouTube, Pinterest, LinkedIn, X |
 | Marketing | Detected marketing stack (pixels, Klaviyo, SMS, reviews, loyalty, subscriptions, BNPL, chat…) and a 0–100 marketing score |
 | **How they can improve** | Separate **website**, **marketing** and **brand/company** improvement ideas |
 
-You pick **how many brands**, the **niche** (16 presets or your own), optional keywords and
-market, **target revenue**, **brand age** and **funding stage**.
+You pick **how many brands**, the **niche** (16 presets or your own), optional keywords, a
+**location** (country, state/province and city, as specific as you like) and **brand age**.
 
 ```
 ecom-scraper/
@@ -68,7 +68,7 @@ Put them in `backend/.env`:
 
 | Key | What it adds | Without it |
 |---|---|---|
-| `BRAVE_API_KEY` ([free tier](https://brave.com/search/api/)) or `SERPAPI_KEY` | Reliable brand discovery and funding lookups | Falls back to DuckDuckGo's HTML results, fine for small runs but can be rate-limited |
+| `BRAVE_API_KEY` ([free tier](https://brave.com/search/api/)) or `SERPAPI_KEY` | Reliable brand discovery | Falls back to DuckDuckGo's HTML results, fine for small runs but can be rate-limited |
 | `HUNTER_API_KEY` ([hunter.io](https://hunter.io/api)) | Verified founder/CEO emails | Uses only emails published on the brand's own site |
 | `ANTHROPIC_API_KEY` | Claude writes the "what they do" summary and tailored improvement ideas, and double-checks that each site is a real brand in your niche | Rule-based summary + ideas (still specific to what's missing on each site) |
 
@@ -86,20 +86,17 @@ server-side refusal fallback turned on.
    (including `name [at] brand [dot] com` style), plus socials and marketing tools.
 4. **Enrich** from public sources:
    - **Age**: "founded/est. 20XX" on the site → oldest product listing → domain registration date (RDAP).
-   - **Funding**: press/news search for seed / Series A–D / acquisition mentions and amounts.
    - **Catalog**: Shopify's public `/products.json` for product count and prices.
-5. **Filter** by your revenue / age / funding choices. If a brand's age or funding can't be
-   found, it's kept and noted, unless you tick *Strict filters*.
-6. **Analyse**: estimates revenue, scores marketing maturity and writes improvement ideas.
+5. **Filter** by location and age. The location is read from the site (address, "based in…",
+   "made in…") and checked against your choice. Brands that don't confirm it are kept and
+   marked "not confirmed", unless you tick *Only keep brands whose website confirms they're
+   based there*. Brands of unknown age are kept unless you tick *Strict age filter*.
+6. **Analyse**: scores marketing maturity and writes improvement ideas.
 
 ### About the numbers
 
-- **Revenue is an estimate.** Private brands don't publish revenue, so the band comes from
-  public signals (catalog size, price point, how many paid marketing tools they run, funding,
-  age, hiring, wholesale, international selling). The `Revenue basis` column shows why.
-  Use it to rank leads, not as a fact.
-- **Funding** comes from news and press mentions. "No public funding found" usually means
-  bootstrapped, but not always.
+- **Location** is only what the brand states on its own site. Many small brands don't say
+  where they're based, so "not confirmed" often just means "not stated".
 - **Email confidence**: `verified` = Hunter.io; `high` = matches the founder's name or is
   founder@/ceo@; `medium` = a person's address on the brand domain; `low` = a general inbox like hello@ or info@.
 

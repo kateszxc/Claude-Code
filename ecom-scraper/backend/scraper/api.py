@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 
 from . import llm
 from .config import settings
-from .models import FUNDING_FILTERS, NICHES, REVENUE_BANDS, JobState, ScrapeRequest
+from .models import NICHES, JobState, ScrapeRequest
 from .pipeline import run_job, write_csv
 
 app = FastAPI(title="E-com Brand Scraper", version="1.0")
@@ -35,8 +35,6 @@ async def health():
 async def options():
     return {
         "niches": [{"id": k, "label": v["label"]} for k, v in NICHES.items()],
-        "revenue_bands": [{"id": k, "label": v} for k, v in REVENUE_BANDS.items()],
-        "funding": [{"id": k, "label": v} for k, v in FUNDING_FILTERS.items()],
         "providers": {
             "search": settings.search_provider,
             "hunter": bool(settings.hunter_api_key),

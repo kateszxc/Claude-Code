@@ -9,12 +9,13 @@ from pathlib import Path
 
 from . import extract as ex
 from . import llm
-from .analysis import SiteSignals, audit, estimate_revenue, marketing_score
+from . import location as loc
+from .analysis import SiteSignals, audit, marketing_score
 from .config import settings
 from .discovery import discover, registrable_domain
-from .enrich import domain_registered, funding_lookup, hunter_founder, shopify_catalog, years_since
+from .enrich import domain_registered, hunter_founder, shopify_catalog, years_since
 from .fetcher import Fetcher
-from .models import NICHES, REVENUE_BANDS, BrandResult, JobState, ScrapeRequest
+from .models import NICHES, BrandResult, JobState, ScrapeRequest
 
 
 class Rejected(Exception):
@@ -28,20 +29,6 @@ def _now() -> str:
 def niche_matches(text: str, req: ScrapeRequest) -> bool:
     low = text.lower()
     return any(k.lower() in low for k in req.niche_keywords) if req.niche_keywords else True
-
-
-def funding_passes(stage: str, wanted: str) -> bool:
-    if wanted == "any":
-        return True
-    if wanted == "bootstrapped":
-        return stage == ""
-    if wanted == "pre_seed_seed":
-        return stage in ("Pre-seed", "Seed")
-    if wanted == "series_a_plus":
-        return stage.startswith("Series") or stage == "Acquired"
-    if wanted == "funded_any":
-        return stage != ""
-    return True
 
 
 async def scrape_brand(fetcher: Fetcher, domain: str, req: ScrapeRequest, use_ai: bool) -> BrandResult:
@@ -84,16 +71,23 @@ async def scrape_brand(fetcher: Fetcher, domain: str, req: ScrapeRequest, use_ai
         for e in ex.extract_emails(html):
             email_source.setdefault(e, url)
     founders = ex.find_founders(all_text, about_soup or soup)
+
+    # Location: where the brand says it's based vs. what was asked for
+    soups = [soup] + [ex.soupify(p.text) for _, p in pages]
+    based_in = loc.detect_location(all_text, soups)
+    wants_place = bool(req.location_label)
+    in_place = loc.matches(req.city, req.state, req.country, f"{based_in} {all_text}", domain) if wants_place else True
+    if wants_place and not in_place and req.location_required and not use_ai:
+        raise Rejected(f"location not confirmed as {req.location_label}" + (f" (site says {based_in})" if based_in else ""))
     ranked = ex.rank_emails(list(email_source), domain, founders)
 
     brand = ex.brand_name(soup, domain)
     platform = ex.detect_platform(home.text) or "Custom / unknown"
 
     catalog_task = shopify_catalog(fetcher, base) if platform == "Shopify" else asyncio.sleep(0, None)
-    catalog, registered, funding, hunter = await asyncio.gather(
+    catalog, registered, hunter = await asyncio.gather(
         catalog_task,
         domain_registered(fetcher, domain),
-        funding_lookup(fetcher, brand, domain),
         hunter_founder(fetcher, domain),
     )
 
@@ -120,22 +114,15 @@ async def scrape_brand(fetcher: Fetcher, domain: str, req: ScrapeRequest, use_ai
             req.max_age_years is not None and age > req.max_age_years
         ):
             raise Rejected(f"age {age:g} yrs outside range")
-    if not funding_passes(funding.stage, req.funding):
-        raise Rejected(f"funding '{funding.status}' doesn't match")
-    if req.funding == "bootstrapped" and not req.strict_filters:
-        notes.append("no public funding found (assumed bootstrapped)")
 
     stack = ex.marketing_stack(home.text)
     features = ex.site_features(soup, home.text, home.url)
     soc = ex.socials(soup)
     signals = SiteSignals(
         platform=platform, stack=stack, features=features, socials=soc, catalog=catalog,
-        funding=funding, age_years=age, response_ms=home.elapsed_ms, html_kb=len(home.text) // 1024,
+        age_years=age, response_ms=home.elapsed_ms, html_kb=len(home.text) // 1024,
         has_about_page=about_soup is not None, about_text=about_text, founders=founders,
     )
-    band, basis = estimate_revenue(signals)
-    if req.revenue_bands and band not in req.revenue_bands:
-        raise Rejected(f"estimated revenue {REVENUE_BANDS[band]} outside target")
 
     website_ideas, marketing_ideas, brand_ideas = audit(signals)
     summary = about_text or ex.description(soup)
@@ -147,11 +134,12 @@ async def scrape_brand(fetcher: Fetcher, domain: str, req: ScrapeRequest, use_ai
             f"Socials: {', '.join(soc) or 'none linked'}",
             f"Products: {catalog.product_count if catalog else 'unknown'}; avg price: {catalog.avg_price if catalog else 'unknown'}",
             f"Founded/age: {year or 'unknown'} ({age_source})",
-            f"Funding: {funding.status}",
+            f"Location detected: {based_in or 'unknown'}",
             "Rule-based gaps found: " + "; ".join(website_ideas + marketing_ideas + brand_ideas),
         ])
         insight = await llm.brand_insight(
-            niche=req.niche_label, domain=domain, name=brand, page_text=all_text[:12000], facts=facts
+            niche=req.niche_label, domain=domain, name=brand, page_text=all_text[:12000], facts=facts,
+            location=req.location_label,
         )
         if insight:
             if not insight.is_ecommerce_brand:
@@ -159,11 +147,20 @@ async def scrape_brand(fetcher: Fetcher, domain: str, req: ScrapeRequest, use_ai
             if not insight.matches_niche:
                 raise Rejected("AI review: outside the requested niche")
             summary = insight.what_they_do or summary
+            based_in = based_in or insight.based_in
+            if wants_place and not in_place:
+                in_place = insight.in_requested_location or loc.matches(
+                    req.city, req.state, req.country, insight.based_in, domain
+                )
             website_ideas = insight.website_improvements or website_ideas
             marketing_ideas = insight.marketing_improvements or marketing_ideas
             brand_ideas = insight.brand_improvements or brand_ideas
         elif not niche_matches(all_text, req):
             raise Rejected("doesn't look like the requested niche")
+        if wants_place and not in_place and req.location_required:
+            raise Rejected(f"location not confirmed as {req.location_label}")
+    if wants_place and not in_place:
+        notes.append(f"couldn't confirm it's based in {req.location_label} – kept")
 
     founder_name = founders[0] if founders else ""
     founder_email, confidence, source = "", "none", ""
@@ -190,13 +187,11 @@ async def scrape_brand(fetcher: Fetcher, domain: str, req: ScrapeRequest, use_ai
         email_confidence=confidence,
         email_source=source,
         other_emails=[e for e, _ in ranked if e != founder_email][:5],
-        est_revenue_band=REVENUE_BANDS[band],
-        revenue_basis=basis,
+        location=based_in,
+        location_match=("confirmed" if in_place else "not confirmed") if wants_place else "",
         brand_age_years=age,
         founded_year=year,
         age_source=age_source,
-        funding_status=funding.status,
-        funding_details=funding.details,
         product_count=(f"{catalog.product_count}+" if catalog.capped else str(catalog.product_count)) if catalog else "",
         price_range=price_range,
         avg_price=catalog.avg_price if catalog else None,
@@ -220,9 +215,8 @@ CSV_COLUMNS = [
     ("What they do", "what_they_do"), ("Platform", "platform"), ("Founder name", "founder_name"),
     ("Founder email", "founder_email"), ("Email confidence", "email_confidence"),
     ("Email source", "email_source"), ("Other emails", "other_emails"),
-    ("Est. revenue", "est_revenue_band"), ("Revenue basis", "revenue_basis"),
+    ("Location", "location"), ("Location match", "location_match"),
     ("Brand age (yrs)", "brand_age_years"), ("Founded", "founded_year"), ("Age source", "age_source"),
-    ("Funding status", "funding_status"), ("Funding details", "funding_details"),
     ("Products", "product_count"), ("Price range", "price_range"), ("Avg price", "avg_price"),
     ("Instagram", "socials.instagram"), ("TikTok", "socials.tiktok"), ("Facebook", "socials.facebook"),
     ("YouTube", "socials.youtube"), ("Pinterest", "socials.pinterest"), ("LinkedIn", "socials.linkedin"),
@@ -272,7 +266,9 @@ async def run_job(job: JobState, fetcher: Fetcher | None = None, max_scan: int |
         job.message = msg
 
     log(
-        f"Looking for {req.count} {req.niche_label} brands · search: {settings.search_provider}"
+        f"Looking for {req.count} {req.niche_label} brands"
+        + (f" in {req.location_label}" if req.location_label else "")
+        + f" · search: {settings.search_provider}"
         f" · AI insights: {'on' if use_ai else 'off'}"
         f" · Hunter.io: {'on' if settings.hunter_api_key else 'off'}"
     )

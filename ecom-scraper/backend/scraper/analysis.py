@@ -1,11 +1,9 @@
-"""Revenue estimation + rule-based marketing / website / brand audit."""
+"""Rule-based marketing / website / brand audit."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .enrich import Catalog, Funding
-
-BAND_ORDER = ["under_1m", "1m_5m", "5m_20m", "20m_plus"]
+from .enrich import Catalog
 
 
 @dataclass
@@ -15,7 +13,6 @@ class SiteSignals:
     features: dict[str, bool]
     socials: dict[str, str]
     catalog: Catalog | None
-    funding: Funding
     age_years: float | None
     response_ms: int
     html_kb: int
@@ -26,61 +23,6 @@ class SiteSignals:
     @property
     def categories(self) -> set[str]:
         return {c for _, c in self.stack}
-
-
-def estimate_revenue(s: SiteSignals) -> tuple[str, str]:
-    """Heuristic revenue band from public signals. Returns (band, basis)."""
-    points = 0
-    basis: list[str] = []
-    if s.catalog:
-        n = s.catalog.product_count
-        if s.catalog.capped or n >= 250:
-            points += 3
-            basis.append("250+ products")
-        elif n >= 100:
-            points += 2
-            basis.append(f"{n} products")
-        elif n >= 30:
-            points += 1
-            basis.append(f"{n} products")
-        if s.catalog.avg_price and s.catalog.avg_price >= 100:
-            points += 1
-            basis.append(f"avg price ${s.catalog.avg_price:.0f}")
-    paid = {"ads", "email", "sms", "reviews", "loyalty", "subscriptions", "bnpl", "chat", "upsell", "affiliate"}
-    depth = len(s.categories & paid)
-    if depth >= 7:
-        points += 4
-    elif depth >= 5:
-        points += 3
-    elif depth >= 3:
-        points += 2
-    elif depth >= 1:
-        points += 1
-    if depth:
-        basis.append(f"{depth} paid marketing tool categories")
-    if s.funding.stage in ("Series A", "Series B", "Series C", "Series D+", "Acquired"):
-        points += 4
-        basis.append(s.funding.stage)
-    elif s.funding.disclosed:
-        points += 1
-        basis.append(s.funding.stage)
-    if s.age_years is not None:
-        if s.age_years >= 8:
-            points += 2
-        elif s.age_years >= 4:
-            points += 1
-        basis.append(f"~{s.age_years:g} yrs old")
-    for key, label in (("careers", "hiring"), ("wholesale", "wholesale/stockists")):
-        if s.features.get(key):
-            points += 1
-            basis.append(label)
-    if "international" in s.categories:
-        points += 1
-        basis.append("sells internationally")
-    if len(s.socials) >= 4:
-        points += 1
-    band = BAND_ORDER[0] if points <= 4 else BAND_ORDER[1] if points <= 8 else BAND_ORDER[2] if points <= 12 else BAND_ORDER[3]
-    return band, "Estimate from: " + (", ".join(basis) if basis else "few public signals")
 
 
 def marketing_score(s: SiteSignals) -> int:
@@ -191,8 +133,8 @@ def audit(s: SiteSignals) -> tuple[list[str], list[str], list[str]]:
         brand.append("Sell gift cards – easy holiday revenue and new-customer acquisition through gifting.")
     if not f.get("quiz") and s.catalog and s.catalog.product_count >= 15:
         brand.append("Add a product-finder quiz to guide shoppers through a large catalog and collect zero-party data.")
-    if s.funding.stage == "":
-        brand.append("Collect press mentions and awards ('As seen in…') to add credibility while bootstrapped.")
+    if not f.get("press"):
+        brand.append("Collect press mentions and awards and show an 'As seen in…' strip to add credibility.")
     if s.age_years is not None and s.age_years < 2:
         brand.append("Young brand: focus on a hero product and a sharp positioning statement before expanding the range.")
 

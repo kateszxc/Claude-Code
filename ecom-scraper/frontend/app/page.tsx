@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { COUNTRIES, REGIONS } from "@/lib/locations";
 import type { BrandResult, Job, Options, ScrapeRequest } from "@/lib/types";
 
 const CUSTOM = "__custom__";
@@ -21,10 +22,12 @@ export default function Home() {
   const [customNiche, setCustomNiche] = useState("");
   const [keywords, setKeywords] = useState("");
   const [country, setCountry] = useState("");
-  const [revenue, setRevenue] = useState<string[]>([]);
+  const [customCountry, setCustomCountry] = useState("");
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
+  const [onlyThere, setOnlyThere] = useState(false);
   const [minAge, setMinAge] = useState("");
   const [maxAge, setMaxAge] = useState("");
-  const [funding, setFunding] = useState("any");
   const [seedUrls, setSeedUrls] = useState("");
   const [strict, setStrict] = useState(false);
   const [useAi, setUseAi] = useState(true);
@@ -73,11 +76,12 @@ export default function Home() {
       count,
       niche: nicheValue,
       keywords,
-      country,
-      revenue_bands: revenue,
+      country: countryValue,
+      state: region.trim(),
+      city: city.trim(),
+      location_required: onlyThere && hasLocation,
       min_age_years: minAge === "" ? null : Number(minAge),
       max_age_years: maxAge === "" ? null : Number(maxAge),
-      funding,
       seed_urls: seedUrls.split(/[\s,]+/).filter(Boolean),
       strict_filters: strict,
       use_ai: useAi,
@@ -102,8 +106,9 @@ export default function Home() {
     poll(job.id);
   }
 
-  const toggleBand = (id: string) =>
-    setRevenue((prev) => (prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]));
+  const countryValue = (country === CUSTOM ? customCountry : country).trim();
+  const hasLocation = Boolean(countryValue || region.trim() || city.trim());
+  const regionOptions = REGIONS[country];
 
   const pct = job ? Math.round((100 * job.found) / Math.max(job.request.count, 1)) : 0;
 
@@ -113,7 +118,7 @@ export default function Home() {
         <h1>E-com Brand Scraper</h1>
         <p>
           Find e-commerce brands in your niche and get each one's domain, what they sell, founder email,
-          estimated revenue, age, funding and specific growth ideas, exported to CSV.
+          location, age and specific growth ideas, exported to CSV.
         </p>
       </header>
 
@@ -147,27 +152,47 @@ export default function Home() {
           )}
         </div>
 
-        <div className="row">
-          <div className="field">
-            <label htmlFor="kw">Extra keywords <span className="hint">(optional)</span></label>
-            <input id="kw" placeholder="vegan, clean, women-owned" value={keywords} onChange={(e) => setKeywords(e.target.value)} />
-          </div>
-          <div className="field">
-            <label htmlFor="country">Market <span className="hint">(optional)</span></label>
-            <input id="country" placeholder="US, UK, Australia…" value={country} onChange={(e) => setCountry(e.target.value)} />
-          </div>
+        <div className="field">
+          <label htmlFor="kw">Extra keywords <span className="hint">(optional)</span></label>
+          <input id="kw" placeholder="vegan, clean, women-owned" value={keywords} onChange={(e) => setKeywords(e.target.value)} />
         </div>
 
         <fieldset className="field">
-          <legend>Target revenue <span className="hint">(estimated · none selected = any)</span></legend>
-          <div className="chips">
-            {options?.revenue_bands.map((b) => (
-              <button type="button" key={b.id} className={`chip ${revenue.includes(b.id) ? "active" : ""}`}
-                onClick={() => toggleBand(b.id)} aria-pressed={revenue.includes(b.id)}>
-                {b.label}
-              </button>
-            ))}
+          <legend>Location <span className="hint">(optional – fill in as much or as little as you like)</span></legend>
+          <div className="row">
+            <div className="field">
+              <label htmlFor="country">Country</label>
+              <select id="country" value={country} onChange={(e) => { setCountry(e.target.value); setRegion(""); }}>
+                <option value="">Anywhere</option>
+                {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                <option value={CUSTOM}>Other – type it…</option>
+              </select>
+              {country === CUSTOM && (
+                <input placeholder="Country name" value={customCountry} onChange={(e) => setCustomCountry(e.target.value)} />
+              )}
+            </div>
+            <div className="field">
+              <label htmlFor="region">State / province / region</label>
+              {regionOptions ? (
+                <select id="region" value={region} onChange={(e) => setRegion(e.target.value)}>
+                  <option value="">Any</option>
+                  {regionOptions.map((r) => <option key={r} value={r}>{r}</option>)}
+                </select>
+              ) : (
+                <input id="region" placeholder="e.g. Bavaria, Metro Manila" value={region} onChange={(e) => setRegion(e.target.value)} />
+              )}
+            </div>
+            <div className="field">
+              <label htmlFor="city">City</label>
+              <input id="city" placeholder="e.g. Los Angeles" value={city} onChange={(e) => setCity(e.target.value)} />
+            </div>
           </div>
+          {hasLocation && (
+            <label className="check">
+              <input type="checkbox" checked={onlyThere} onChange={(e) => setOnlyThere(e.target.checked)} />
+              Only keep brands whose website confirms they&apos;re based there
+            </label>
+          )}
         </fieldset>
 
         <div className="row">
@@ -178,14 +203,6 @@ export default function Home() {
           <div className="field">
             <label htmlFor="maxAge">to (years)</label>
             <input id="maxAge" type="number" min={0} step="0.5" placeholder="any" value={maxAge} onChange={(e) => setMaxAge(e.target.value)} />
-          </div>
-          <div className="field">
-            <label htmlFor="funding">Funding</label>
-            <select id="funding" value={funding} onChange={(e) => setFunding(e.target.value)}>
-              {options?.funding.map((f) => (
-                <option key={f.id} value={f.id}>{f.label}</option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -198,7 +215,7 @@ export default function Home() {
           </div>
           <label className="check">
             <input type="checkbox" checked={strict} onChange={(e) => setStrict(e.target.checked)} />
-            Strict filters: drop brands whose age or funding can't be confirmed
+            Strict age filter: drop brands whose age can&apos;t be confirmed
           </label>
           <label className="check">
             <input type="checkbox" checked={useAi && !!options?.providers.ai} disabled={!options?.providers.ai} onChange={(e) => setUseAi(e.target.checked)} />
@@ -246,7 +263,7 @@ export default function Home() {
               <thead>
                 <tr>
                   <th>Brand</th><th>What they do</th><th>Founder</th><th>Email</th>
-                  <th>Est. revenue</th><th>Age</th><th>Funding</th><th>Mktg score</th><th />
+                  <th>Location</th><th>Age</th><th>Mktg score</th><th />
                 </tr>
               </thead>
               <tbody>
@@ -261,7 +278,7 @@ export default function Home() {
       )}
 
       <footer className="muted foot">
-        Uses only publicly available information and respects robots.txt. Revenue is an estimate from public signals.
+        Uses only publicly available information and respects robots.txt.
         Follow CAN-SPAM / GDPR rules when contacting anyone.
       </footer>
     </main>
@@ -286,25 +303,26 @@ function ResultRows({ r, open, onToggle }: { r: BrandResult; open: boolean; onTo
           {r.founder_email ? <a href={`mailto:${r.founder_email}`}>{r.founder_email}</a> : <span className="muted">none found</span>}
           {r.founder_email && <span className={`badge ${r.email_confidence}`}>{r.email_confidence}</span>}
         </td>
-        <td>{r.est_revenue_band}</td>
+        <td>
+          {r.location || <span className="muted">not stated</span>}
+          {r.location_match && <span className={`badge ${r.location_match === "confirmed" ? "high" : ""}`}>{r.location_match}</span>}
+        </td>
         <td>{r.brand_age_years != null ? `${r.brand_age_years} yrs` : "?"}</td>
-        <td>{r.funding_status}</td>
         <td><span className="score">{r.marketing_score}</span></td>
         <td><button className="ghost small" onClick={onToggle}>{open ? "Hide" : "Ideas"}</button></td>
       </tr>
       {open && (
         <tr className="detail">
-          <td colSpan={9}>
+          <td colSpan={8}>
             <div className="ideas">
               <IdeaList title="Website" items={r.website_improvements} />
               <IdeaList title="Marketing" items={r.marketing_improvements} />
               <IdeaList title="Brand / company" items={r.brand_improvements} />
             </div>
             <div className="facts muted small">
-              <span><b>Revenue basis:</b> {r.revenue_basis}</span>
               <span><b>Age source:</b> {r.age_source}{r.founded_year ? ` (${r.founded_year})` : ""}</span>
               {r.product_count && <span><b>Products:</b> {r.product_count} · {r.price_range}</span>}
-              {r.funding_details && <span><b>Funding:</b> {r.funding_details}</span>}
+              {r.filter_notes.length > 0 && <span><b>Notes:</b> {r.filter_notes.join("; ")}</span>}
               {r.marketing_stack.length > 0 && <span><b>Stack:</b> {r.marketing_stack.join(", ")}</span>}
               {Object.keys(r.socials).length > 0 && (
                 <span><b>Socials:</b>{" "}

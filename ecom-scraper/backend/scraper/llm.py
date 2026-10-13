@@ -14,6 +14,10 @@ class BrandInsight(BaseModel):
     what_they_do: str = Field(description="1-2 sentence plain-English summary of the brand and what it sells")
     is_ecommerce_brand: bool = Field(description="True only if this is a brand selling its own products online")
     matches_niche: bool = Field(description="True if the brand fits the requested niche")
+    based_in: str = Field(description="City / state / country where the brand says it is based; empty if not stated")
+    in_requested_location: bool = Field(
+        description="True if the brand is based in the requested location (always true when none was requested)"
+    )
     website_improvements: list[str] = Field(description="3-5 specific website / conversion improvements")
     marketing_improvements: list[str] = Field(description="3-5 specific marketing / growth improvements")
     brand_improvements: list[str] = Field(description="2-4 specific brand / company improvements")
@@ -42,13 +46,15 @@ def _get_client():
     return _client
 
 
-async def brand_insight(*, niche: str, domain: str, name: str, page_text: str, facts: str) -> BrandInsight | None:
+async def brand_insight(
+    *, niche: str, domain: str, name: str, page_text: str, facts: str, location: str = ""
+) -> BrandInsight | None:
     if not enabled():
         return None
     import anthropic
 
     prompt = (
-        f"Requested niche: {niche}\nBrand: {name} ({domain})\n\n"
+        f"Requested niche: {niche}\nRequested location: {location or 'any'}\nBrand: {name} ({domain})\n\n"
         f"Detected facts:\n{facts}\n\n"
         f"Website text (homepage + about/contact pages):\n<site>\n{page_text}\n</site>"
     )

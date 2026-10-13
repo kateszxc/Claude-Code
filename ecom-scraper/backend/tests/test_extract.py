@@ -97,3 +97,31 @@ def test_parse_duckduckgo():
     hits = parse_duckduckgo((FIX / "ddg.html").read_text())
     assert hits[0].url == "https://glowtheory.com/"
     assert hits[1].title.startswith("15 Best")
+
+
+def test_detect_location():
+    from scraper.location import detect_location
+
+    soup = ex.soupify(ABOUT)
+    assert detect_location(ex.visible_text(soup), [soup]) == "Portland, Oregon"
+    assert detect_location("Proudly based in Austin, Texas since 2015.", []) == "Austin, Texas"
+    assert detect_location("Visit us: 12 Main St, Boulder, CO 80302", []) == "Boulder, CO"
+    ld = ex.soupify('<script type="application/ld+json">{"@type":"Organization","address":'
+                    '{"@type":"PostalAddress","addressLocality":"Toronto","addressRegion":"ON","addressCountry":"CA"}}</script>')
+    assert detect_location("", [ld]) == "Toronto, ON, CA"
+    assert detect_location("Free shipping on all orders.", []) == ""
+
+
+def test_location_matches():
+    from scraper.location import matches
+
+    text = "Portland, Oregon"
+    assert matches("Portland", "Oregon", "United States", text, "x.com")
+    assert not matches("Austin", "", "", text, "x.com")
+    assert matches("", "Oregon", "", text, "x.com")
+    assert matches("", "Texas", "", "Austin, TX 78701", "x.com")
+    assert not matches("", "Oregon", "", "Shop OR browse", "x.com")  # "OR" alone isn't Oregon
+    assert matches("", "", "United States", text, "x.com")  # a US state implies the US
+    assert matches("", "", "United Kingdom", "Free UK delivery", "x.com")
+    assert matches("", "", "Australia", "", "brand.com.au")  # country TLD
+    assert not matches("", "", "Canada", text, "x.com")

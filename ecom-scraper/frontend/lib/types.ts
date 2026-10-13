@@ -2,8 +2,6 @@ export type Option = { id: string; label: string };
 
 export type Options = {
   niches: Option[];
-  revenue_bands: Option[];
-  funding: Option[];
   providers: { search: "brave" | "serpapi" | "duckduckgo"; hunter: boolean; ai: boolean };
 };
 
@@ -12,10 +10,11 @@ export type ScrapeRequest = {
   niche: string;
   keywords: string;
   country: string;
-  revenue_bands: string[];
+  state: string;
+  city: string;
+  location_required: boolean;
   min_age_years: number | null;
   max_age_years: number | null;
-  funding: string;
   seed_urls: string[];
   strict_filters: boolean;
   use_ai: boolean;
@@ -33,13 +32,11 @@ export type BrandResult = {
   email_confidence: "verified" | "high" | "medium" | "low" | "none" | string;
   email_source: string;
   other_emails: string[];
-  est_revenue_band: string;
-  revenue_basis: string;
+  location: string;
+  location_match: "confirmed" | "not confirmed" | "";
   brand_age_years: number | null;
   founded_year: number | null;
   age_source: string;
-  funding_status: string;
-  funding_details: string;
   product_count: string;
   price_range: string;
   avg_price: number | null;

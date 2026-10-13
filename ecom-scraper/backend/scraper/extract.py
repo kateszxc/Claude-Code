@@ -381,6 +381,7 @@ def site_features(soup: BeautifulSoup, html: str, base_url: str) -> dict[str, bo
         "reviews_visible": bool(re.search(r"\b(reviews?|stars?|rated)\b", low)),
         "wholesale": "wholesale" in links or "stockist" in links,
         "careers": "careers" in links or "/jobs" in links,
+        "press": "press" in links or "as seen in" in low or "featured in" in low,
         "affiliate_page": bool(re.search(r"affiliate|ambassador|creator program|influencer", links)),
         "free_shipping_msg": "free shipping" in low,
         "gift_cards": "gift card" in links,

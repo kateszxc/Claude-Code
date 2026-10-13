@@ -1,14 +1,13 @@
 """Enrichment from public online sources: RDAP (domain age), Shopify catalog,
-web search (funding news), and optionally Hunter.io (founder emails)."""
+and optionally Hunter.io (founder emails)."""
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from .config import settings
 from .fetcher import Fetcher
-from .search import search
 
 
 # ---------------------------------------------------------------------------
@@ -72,64 +71,6 @@ async def shopify_catalog(fetcher: Fetcher, base_url: str) -> Catalog | None:
         avg_price=round(sum(prices) / len(prices), 2) if prices else None,
         oldest_product=oldest,
     )
-
-
-# ---------------------------------------------------------------------------
-# Funding (public news / press via web search)
-# ---------------------------------------------------------------------------
-
-STAGES = [
-    ("Series D+", re.compile(r"series\s+[d-h]\b", re.I)),
-    ("Series C", re.compile(r"series\s+c\b", re.I)),
-    ("Series B", re.compile(r"series\s+b\b", re.I)),
-    ("Series A", re.compile(r"series\s+a\b", re.I)),
-    ("Seed", re.compile(r"\bseed\s+(round|funding|investment)|\braises?\s+.{0,30}\bseed\b", re.I)),
-    ("Pre-seed", re.compile(r"pre-?seed", re.I)),
-]
-AMOUNT = re.compile(r"(?:raise[sd]?|secures?|secured|closes?|closed|lands?|announce[sd]?)\s+(?:a\s+)?"
-                    r"([$£€]\s?\d+(?:\.\d+)?\s?(?:million|m|mn|billion|bn|k)\b)", re.I)
-ACQUIRED = re.compile(r"\b(acquired by|acquires|acquisition of)\b", re.I)
-
-
-@dataclass
-class Funding:
-    status: str = "No public funding found"
-    stage: str = ""  # "", Pre-seed, Seed, Series A..., Acquired
-    details: str = ""
-    sources: list[str] = field(default_factory=list)
-
-    @property
-    def disclosed(self) -> bool:
-        return bool(self.stage)
-
-
-async def funding_lookup(fetcher: Fetcher, brand: str, domain: str) -> Funding:
-    query = f'"{brand}" {domain.split(".")[0]} raises funding OR "seed round" OR "series a" OR investors'
-    hits = await search(fetcher, query, limit=10)
-    result = Funding()
-    brand_low = brand.lower()
-    best_rank = len(STAGES)
-    for hit in hits:
-        blob = f"{hit.title}. {hit.snippet}"
-        if brand_low not in blob.lower() and domain.split(".")[0] not in blob.lower():
-            continue
-        amount = AMOUNT.search(blob)
-        if ACQUIRED.search(blob) and not result.stage:
-            result.stage, result.status = "Acquired", "Acquired (per press)"
-            result.details = hit.title[:160]
-            result.sources.append(hit.url)
-        for rank, (label, pattern) in enumerate(STAGES):
-            if pattern.search(blob) and rank < best_rank:
-                best_rank = rank
-                result.stage = label
-                result.status = f"Funded – {label}"
-                result.details = (f"{amount.group(1)} – " if amount else "") + hit.title[:160]
-                result.sources.append(hit.url)
-        if amount and not result.stage:
-            result.stage, result.status = "Funded (stage unknown)", "Funded – stage unknown"
-            result.details = f"{amount.group(1)} – {hit.title[:160]}"
-            result.sources.append(hit.url)
-    return result
 
 
 # ---------------------------------------------------------------------------
