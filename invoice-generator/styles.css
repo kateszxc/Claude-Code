@@ -416,7 +416,7 @@ textarea.field { resize: vertical; min-height: 40px; }
 }
 
 /* --- Responsive --- */
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { position: static; order: -1; }
   .paper { padding: 20px; }
@@ -426,7 +426,7 @@ textarea.field { resize: vertical; min-height: 40px; }
   .meta, .balance-box { max-width: none; }
   .help-grid { grid-template-columns: 1fr; }
 }
-@media (max-width: 600px) {
+@media screen and (max-width: 600px) {
   .parties { grid-template-columns: 1fr; }
   .meta-row, .balance-box { grid-template-columns: 1fr 1fr; }
   .total-row { grid-template-columns: 1fr 1fr; }
@@ -440,27 +440,138 @@ textarea.field { resize: vertical; min-height: 40px; }
   .item-remove { visibility: visible; }
 }
 
-/* --- Print / PDF --- */
+/* --- Print / PDF ---
+   The PDF is not a print of the editor. app.js renders the invoice into
+   #print-view as plain text, laid out to fit A4 and Letter alike. */
+.print-view { display: none; }
+
 @media print {
-  @page { margin: 14mm; }
-  * { transition: none !important; }
-  body { background: #fff; font-size: 12px; }
-  input::-webkit-calendar-picker-indicator { display: none; }
-  input[type="date"] { -webkit-appearance: none; appearance: none; }
-  .topbar, .sidebar, .help, .footer,
-  .btn-add, .item-remove, .adj-links, .toggle-type, .remove-adj,
-  .logo-remove { display: none !important; }
-  .layout { display: block; margin: 0; padding: 0; max-width: none; }
-  .paper { border: none; box-shadow: none; padding: 0; }
-  .field, .label-input, .title-input, .hash {
-    border-color: transparent !important;
-    box-shadow: none !important;
-    background: transparent !important;
+  @page { margin: 14mm 14mm 16mm; }
+
+  html, body { background: #fff; }
+  body > *:not(.print-view) { display: none !important; }
+  .print-view {
+    display: block;
+    color: #222831;
+    font-size: 10pt;
+    line-height: 1.4;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
-  textarea.field { resize: none; overflow: hidden; }
-  .logo-box { border: none; background: none; }
-  .logo-box:not(.has-logo) { display: none; }
-  .items-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .balance-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .empty-print { display: none; }
+  .print-view * { overflow-wrap: anywhere; }
+
+  .pv-muted { color: #6b7380; }
+  .pv-pre { white-space: pre-wrap; }
+
+  .pv-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8mm;
+    margin-bottom: 8mm;
+  }
+  .pv-from { flex: 1 1 auto; min-width: 0; }
+  .pv-logo {
+    display: block;
+    max-width: 55mm;
+    max-height: 26mm;
+    object-fit: contain;
+    margin-bottom: 4mm;
+  }
+  .pv-from-text { font-weight: 600; }
+  .pv-title { flex: 0 0 auto; max-width: 45%; text-align: right; }
+  .pv-title h1 {
+    margin: 0;
+    font-size: 24pt;
+    font-weight: 600;
+    letter-spacing: .5pt;
+    line-height: 1.1;
+  }
+  .pv-number { margin-top: 1.5mm; font-size: 11pt; }
+
+  .pv-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 8mm;
+    margin-bottom: 8mm;
+    break-inside: avoid;
+  }
+  .pv-parties {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    gap: 6mm;
+  }
+  .pv-party { flex: 1 1 0; min-width: 0; }
+  .pv-label { font-size: 9pt; margin-bottom: 1mm; }
+  .pv-party-name { font-weight: 600; }
+
+  .pv-meta { flex: 0 0 44%; border-collapse: collapse; }
+  .pv-meta td { padding: 1mm 0; vertical-align: top; }
+  .pv-meta td:first-child { padding-right: 4mm; text-align: right; }
+  .pv-meta td:last-child { text-align: right; width: 50%; }
+  .pv-meta .pv-balance td {
+    padding: 2mm;
+    background: #f1f3f5;
+    font-weight: 700;
+    color: #222831;
+  }
+
+  .pv-items {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .pv-items th {
+    background: #132c33;
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 2mm 3mm;
+  }
+  .pv-items td {
+    padding: 2.5mm 3mm;
+    border-bottom: .3mm solid #e3e6ea;
+    vertical-align: top;
+  }
+  .pv-items .n { text-align: right; white-space: nowrap; }
+  .pv-items .c-qty { width: 15%; }
+  .pv-items .c-rate { width: 19%; }
+  .pv-items .c-amt { width: 20%; }
+  .pv-items tr { break-inside: avoid; }
+  .pv-items thead { display: table-header-group; }
+
+  .pv-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8mm;
+    margin-top: 6mm;
+  }
+  .pv-notes { flex: 1 1 auto; min-width: 0; }
+  .pv-note + .pv-note { margin-top: 5mm; }
+  .pv-note { break-inside: avoid; }
+
+  .pv-totals {
+    flex: 0 0 44%;
+    border-collapse: collapse;
+    break-inside: avoid;
+  }
+  .pv-totals td { padding: 1.2mm 0; }
+  .pv-totals td:first-child { padding-right: 4mm; text-align: right; }
+  .pv-totals td:last-child { text-align: right; white-space: nowrap; width: 45%; }
+  .pv-totals .pv-total td { border-top: .3mm solid #e3e6ea; padding-top: 2mm; }
+  .pv-totals .pv-balance td {
+    padding: 2mm;
+    background: #f1f3f5;
+    font-weight: 700;
+    color: #222831;
+  }
+
+  /* Very narrow paper (receipt printers, A6): stack the columns. */
+  @media (max-width: 110mm) {
+    .pv-head, .pv-info, .pv-bottom, .pv-parties { flex-direction: column; gap: 4mm; }
+    .pv-title { max-width: none; text-align: left; }
+    .pv-meta, .pv-totals { flex-basis: auto; width: 100%; }
+  }
 }

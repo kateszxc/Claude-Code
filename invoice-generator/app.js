@@ -129,7 +129,10 @@
 
     var shipping = state.shipping.enabled ? num(state.shipping.value) : 0;
     var total = subtotal - discount + tax + shipping;
-    return { subtotal: subtotal, total: total, balance: total - num(state.amountPaid) };
+    return {
+      subtotal: subtotal, discount: discount, tax: tax, shipping: shipping,
+      total: total, paid: num(state.amountPaid), balance: total - num(state.amountPaid)
+    };
   }
 
   // ---------- Rendering ----------
@@ -210,12 +213,6 @@
     });
     paper.querySelector('[data-prefix="paid"]').textContent = sym;
 
-    // Hide empty optional blocks when printing.
-    paper.querySelectorAll('.party, .meta-row, .block').forEach(function (el) {
-      var f = el.querySelector('.field');
-      el.classList.toggle('empty-print', !f.value.trim());
-    });
-
     persist();
   }
 
@@ -231,6 +228,96 @@
     renderItems();
     renderLogo();
     update();
+  }
+
+  // ---------- Print / PDF ----------
+  var printView = document.getElementById('print-view');
+
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function prettyDate(v) {
+    if (!v) return '';
+    var d = new Date(v + 'T00:00:00');
+    return isNaN(d) ? v : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+  function qtyText(v) {
+    return new Intl.NumberFormat(undefined, { maximumFractionDigits: 4 }).format(num(v));
+  }
+  function pct(v) {
+    return new Intl.NumberFormat(undefined, { maximumFractionDigits: 4 }).format(num(v)) + '%';
+  }
+  // First line of a multi-line block is shown bold, the way an address reads.
+  function block(text, firstClass) {
+    var lines = String(text).trim().split('\n');
+    var first = '<div class="' + firstClass + '">' + esc(lines.shift()) + '</div>';
+    return first + (lines.length ? '<div class="pv-pre">' + esc(lines.join('\n')) + '</div>' : '');
+  }
+
+  function renderPrint() {
+    var L = state.labels;
+    var t = totals();
+    var h = '';
+
+    h += '<header class="pv-head"><div class="pv-from">';
+    if (state.logo) h += '<img class="pv-logo" src="' + esc(state.logo) + '" alt="">';
+    if (state.from.trim()) h += block(state.from, 'pv-from-text');
+    h += '</div><div class="pv-title"><h1>' + esc(L.title) + '</h1>';
+    if (String(state.number).trim()) h += '<div class="pv-number pv-muted"># ' + esc(state.number) + '</div>';
+    h += '</div></header>';
+
+    h += '<section class="pv-info"><div class="pv-parties">';
+    [['billTo', L.billTo], ['shipTo', L.shipTo]].forEach(function (p) {
+      if (!state[p[0]].trim()) return;
+      h += '<div class="pv-party"><div class="pv-label pv-muted">' + esc(p[1]) + '</div>' +
+        block(state[p[0]], 'pv-party-name') + '</div>';
+    });
+    h += '</div><table class="pv-meta"><tbody>';
+    [[L.date, prettyDate(state.date)], [L.terms, state.paymentTerms],
+     [L.dueDate, prettyDate(state.dueDate)], [L.po, state.poNumber]].forEach(function (r) {
+      if (!String(r[1]).trim()) return;
+      h += '<tr><td class="pv-muted">' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td></tr>';
+    });
+    h += '<tr class="pv-balance"><td>' + esc(L.balanceDue) + '</td><td>' + money(t.balance) + '</td></tr>';
+    h += '</tbody></table></section>';
+
+    h += '<table class="pv-items"><colgroup><col><col class="c-qty"><col class="c-rate"><col class="c-amt"></colgroup>' +
+      '<thead><tr><th>' + esc(L.item) + '</th><th class="n">' + esc(L.qty) + '</th><th class="n">' +
+      esc(L.rate) + '</th><th class="n">' + esc(L.amount) + '</th></tr></thead><tbody>';
+    state.items.forEach(function (it) {
+      if (!String(it.desc).trim() && !num(it.rate)) return;
+      h += '<tr><td class="pv-pre">' + esc(String(it.desc).trim()) + '</td><td class="n">' + qtyText(it.qty) +
+        '</td><td class="n">' + money(num(it.rate)) + '</td><td class="n">' + money(num(it.qty) * num(it.rate)) + '</td></tr>';
+    });
+    h += '</tbody></table>';
+
+    h += '<section class="pv-bottom"><div class="pv-notes">';
+    [[L.notes, state.notes], [L.termsBlock, state.terms]].forEach(function (n) {
+      if (!String(n[1]).trim()) return;
+      h += '<div class="pv-note"><div class="pv-label pv-muted">' + esc(n[0]) + '</div><div class="pv-pre">' +
+        esc(String(n[1]).trim()) + '</div></div>';
+    });
+    h += '</div><table class="pv-totals"><tbody>';
+    function row(label, value, cls) {
+      h += '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td' + (cls === 'pv-balance' ? '' : ' class="pv-muted"') +
+        '>' + esc(label) + '</td><td>' + value + '</td></tr>';
+    }
+    row(L.subtotal, money(t.subtotal));
+    if (state.discount.enabled && t.discount) {
+      row(L.discount + (state.discount.type === 'percent' ? ' (' + pct(state.discount.value) + ')' : ''), '&minus;' + money(t.discount));
+    }
+    if (state.tax.enabled && t.tax) {
+      row(L.tax + (state.tax.type === 'percent' ? ' (' + pct(state.tax.value) + ')' : ''), money(t.tax));
+    }
+    if (state.shipping.enabled && t.shipping) row(L.shipping, money(t.shipping));
+    row(L.total, money(t.total), 'pv-total');
+    if (t.paid) row(L.amountPaid, money(t.paid));
+    row(L.balanceDue2, money(t.balance), 'pv-balance');
+    h += '</tbody></table></section>';
+
+    printView.innerHTML = h;
   }
 
   function flash(msg) {
@@ -333,6 +420,7 @@
   document.getElementById('download').addEventListener('click', function () {
     var prevTitle = document.title;
     document.title = (state.labels.title || 'Invoice') + ' ' + (state.number || '');
+    renderPrint();
     window.print();
     document.title = prevTitle;
   });
@@ -365,9 +453,8 @@
     flash('New invoice started.');
   });
 
-  window.addEventListener('beforeprint', function () {
-    paper.querySelectorAll('textarea').forEach(autosize);
-  });
+  // Covers Ctrl+P and the browser menu as well as the Download button.
+  window.addEventListener('beforeprint', renderPrint);
 
   renderAll();
 })();
