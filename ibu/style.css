@@ -1,0 +1,1484 @@
+/* iBU home page — standalone stylesheet */
+
+:root {
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-heading: "Sora", "Inter", system-ui, sans-serif;
+
+    --blue-50: #eff9ff;
+    --blue-100: #def1ff;
+    --blue-200: #b6e5ff;
+    --blue-300: #75d1ff;
+    --blue-400: #2cbaff;
+    --blue-500: #00a1f2;
+    --blue-600: #0080cf;
+    --blue-700: #0066a7;
+    --blue-800: #02568a;
+    --blue-900: #084872;
+    --blue-950: #062d4b;
+
+    --orange-400: #f8a04f;
+    --orange-500: #f5842a;
+    --orange-600: #e3681c;
+
+    --bg: var(--blue-50);
+    --surface: #ffffff;
+    --surface-soft: #f6fbff;
+    --border: #d7e9f6;
+    --text: #0b2236;
+    --muted: #4f6578;
+    --heading: var(--blue-950);
+    --accent: var(--blue-600);
+    --shadow: 0 1px 2px rgba(6, 45, 75, 0.06), 0 12px 32px -12px rgba(6, 45, 75, 0.18);
+
+    --radius: 0.85rem;
+    --container: 1180px;
+}
+
+:root.dark {
+    --bg: #111315;
+    --surface: #1b1e21;
+    --surface-soft: #16191c;
+    --border: #2b3035;
+    --text: #e5e7eb;
+    --muted: #9aa3ad;
+    --heading: #f4f7fa;
+    --accent: var(--blue-300);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+h1,
+h2,
+h3 {
+    margin: 0;
+    font-family: var(--font-heading);
+    color: var(--heading);
+    letter-spacing: -0.02em;
+}
+
+h2 {
+    font-size: clamp(1.75rem, 3.4vw, 2.6rem);
+    line-height: 1.15;
+    margin-top: 0.9rem;
+}
+
+p {
+    margin: 0;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+:focus-visible {
+    outline: 2px solid var(--blue-500);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+.ibu-container {
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+.ibu-section {
+    padding-top: clamp(3.5rem, 8vw, 6rem);
+    padding-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.ibu-muted {
+    color: var(--muted);
+}
+
+.ibu-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange-500);
+}
+
+/* Logo swap for light/dark */
+.logo-dark,
+:root.dark .logo-light {
+    display: none;
+}
+
+:root.dark .logo-dark {
+    display: block;
+}
+
+/* ---------- Header ---------- */
+.ibu-hero {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(60rem 30rem at 50% -10%, rgba(0, 161, 242, 0.35), transparent 70%),
+        radial-gradient(40rem 24rem at 90% 30%, rgba(245, 132, 42, 0.16), transparent 70%),
+        linear-gradient(180deg, var(--blue-100), var(--bg));
+}
+
+:root.dark .ibu-hero {
+    background:
+        radial-gradient(60rem 30rem at 50% -10%, rgba(0, 128, 207, 0.35), transparent 70%),
+        radial-gradient(40rem 24rem at 90% 30%, rgba(245, 132, 42, 0.12), transparent 70%),
+        linear-gradient(180deg, #0c1a26, var(--bg));
+}
+
+.ibu-header {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+}
+
+.ibu-logo img {
+    height: 2rem;
+    width: auto;
+}
+
+.ibu-desktop-nav {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    backdrop-filter: blur(10px);
+}
+
+.ibu-desktop-nav a,
+.ibu-mobile-nav a {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.ibu-desktop-nav a:hover,
+.ibu-mobile-nav a:hover {
+    color: var(--heading);
+}
+
+.ibu-desktop-nav a[aria-current="page"],
+.ibu-mobile-nav a[aria-current="page"] {
+    color: var(--heading);
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(6, 45, 75, 0.12);
+}
+
+.ibu-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.ibu-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--heading);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.ibu-icon-button:hover {
+    transform: translateY(-1px);
+}
+
+.ibu-icon-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.icon-sun,
+:root.dark .icon-moon {
+    display: none;
+}
+
+:root.dark .icon-sun {
+    display: block;
+}
+
+.ibu-sign-in {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.5rem;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    background: var(--blue-950);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.ibu-sign-in:hover {
+    background: var(--blue-700);
+    transform: translateY(-1px);
+}
+
+:root.dark .ibu-sign-in {
+    background: var(--blue-500);
+    color: #04121f;
+}
+
+.ibu-mobile-nav {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+@media (min-width: 1024px) {
+    .ibu-desktop-nav {
+        display: flex;
+    }
+
+    .ibu-menu-button,
+    .ibu-mobile-nav {
+        display: none !important;
+    }
+}
+
+/* ---------- Hero ---------- */
+.ibu-hero-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: clamp(2rem, 6vw, 4.5rem);
+}
+
+.ibu-hero-content > *:not(.ibu-watermark) {
+    position: relative;
+}
+
+.ibu-watermark {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(9rem, 32vw, 26rem);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--blue-500) 22%, transparent);
+    pointer-events: none;
+    user-select: none;
+}
+
+.ibu-launch-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.3rem 0.9rem 0.3rem 0.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    box-shadow: 0 1px 3px rgba(6, 45, 75, 0.08);
+}
+
+.ibu-launch-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--orange-500);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.ibu-launch-new svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: 0.45;
+    }
+}
+
+.ibu-hero h1 {
+    max-width: 14ch;
+    margin-top: 1.5rem;
+    font-size: clamp(2.5rem, 7vw, 4.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+}
+
+.ibu-hero-description {
+    max-width: 36rem;
+    margin-top: 1.25rem;
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.ibu-store-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+}
+
+.ibu-store-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 10rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 0.7rem;
+    background: #000;
+    color: #fff;
+    border: 1px solid #000;
+    text-align: left;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ibu-store-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px -10px rgba(0, 0, 0, 0.55);
+}
+
+:root.dark .ibu-store-badge {
+    border-color: #3a3f45;
+}
+
+.ibu-store-badge svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+}
+
+.ibu-store-caption {
+    display: block;
+    font-size: 0.65rem;
+    line-height: 1.1;
+    opacity: 0.85;
+}
+
+.ibu-store-name {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.ibu-hero-note {
+    margin-top: 0.875rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+}
+
+.ibu-hero-preview {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 3rem;
+    height: clamp(300px, 52vw, 520px);
+}
+
+/* Phone frame */
+.ibu-phone {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    padding: 0.55rem;
+    border-radius: 2.6rem;
+    background: linear-gradient(145deg, #2a2f35, #0d0f12);
+    box-shadow:
+        inset 0 0 0 1.5px #4a5058,
+        0 30px 60px -20px rgba(6, 45, 75, 0.45);
+}
+
+.ibu-phone-screen {
+    position: relative;
+    overflow: hidden;
+    border-radius: 2.1rem;
+    background: #fff;
+    aspect-ratio: 2412 / 5244;
+}
+
+.ibu-phone-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ibu-phone-island {
+    position: absolute;
+    top: 0.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%;
+    height: 1.4rem;
+    border-radius: 999px;
+    background: #000;
+}
+
+.ibu-hero-phone {
+    width: 210px;
+    align-self: flex-start;
+}
+
+@media (min-width: 677px) {
+    .ibu-hero-phone {
+        width: calc(34vw - 20px);
+    }
+}
+
+@media (min-width: 1000px) {
+    .ibu-hero-phone {
+        width: 320px;
+    }
+}
+
+.ibu-floating-card {
+    position: absolute;
+    z-index: 2;
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.1rem 0.85rem 0.85rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow);
+    text-align: left;
+    animation: float 6s ease-in-out infinite;
+}
+
+.ibu-floating-library {
+    top: 18%;
+    left: calc(50% - 26rem);
+}
+
+.ibu-floating-cor {
+    top: 46%;
+    right: calc(50% - 25rem);
+    animation-delay: -3s;
+}
+
+@media (min-width: 640px) {
+    .ibu-floating-card {
+        display: flex;
+    }
+
+    .ibu-floating-library {
+        left: 1rem;
+    }
+
+    .ibu-floating-cor {
+        right: 1rem;
+    }
+}
+
+@media (min-width: 1000px) {
+    .ibu-floating-library {
+        left: calc(50% - 25rem);
+    }
+
+    .ibu-floating-cor {
+        right: calc(50% - 24rem);
+    }
+}
+
+@keyframes float {
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.ibu-floating-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.7rem;
+    background: var(--blue-100);
+    color: var(--blue-700);
+}
+
+.ibu-floating-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.ibu-orange-icon {
+    background: #fff0e3;
+    color: var(--orange-600);
+}
+
+:root.dark .ibu-floating-icon {
+    background: rgba(0, 161, 242, 0.15);
+    color: var(--blue-300);
+}
+
+:root.dark .ibu-orange-icon {
+    background: rgba(245, 132, 42, 0.15);
+    color: var(--orange-400);
+}
+
+.ibu-floating-title {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--heading);
+}
+
+.ibu-floating-text {
+    margin-top: 0.125rem;
+    font-size: 0.75rem;
+}
+
+.ibu-hero-fade {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 5;
+    height: 9rem;
+    background: linear-gradient(180deg, transparent, var(--bg));
+    pointer-events: none;
+}
+
+/* ---------- Seal marquee ---------- */
+.ibu-seals {
+    padding: 2.5rem 0 1rem;
+}
+
+.ibu-seals-title {
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.ibu-marquee {
+    margin-top: 1.5rem;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.ibu-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 55s linear infinite;
+}
+
+.ibu-marquee:hover .ibu-marquee-track {
+    animation-play-state: paused;
+}
+
+@keyframes marquee {
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.ibu-seal-group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 2.5rem;
+    margin: 0;
+    padding: 0 1.25rem;
+    list-style: none;
+}
+
+.ibu-seal-group img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    filter: grayscale(0.35);
+    opacity: 0.85;
+    transition: filter 0.2s, opacity 0.2s, transform 0.2s;
+}
+
+.ibu-seal-group img:hover {
+    filter: none;
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+@media (min-width: 640px) {
+    .ibu-seal-group img {
+        width: 68px;
+        height: 68px;
+    }
+}
+
+/* ---------- App features ---------- */
+.ibu-feature-layout {
+    display: grid;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+    .ibu-feature-layout {
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+    }
+}
+
+.ibu-feature-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+}
+
+@media (min-width: 640px) {
+    .ibu-feature-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.ibu-feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ibu-feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+.ibu-feature-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.ibu-feature-card p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.ibu-feature-number {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--orange-500);
+}
+
+/* App carousel card */
+.ibu-app-card {
+    position: relative;
+    overflow: hidden;
+    padding: 2.25rem 1.25rem 0;
+    border-radius: var(--radius);
+    text-align: center;
+    color: #fff;
+    background:
+        radial-gradient(28rem 18rem at 50% 0%, rgba(44, 186, 255, 0.45), transparent 70%),
+        linear-gradient(160deg, var(--blue-800), var(--blue-950));
+}
+
+.ibu-app-card h3 {
+    font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+    color: #fff;
+}
+
+.ibu-app-card .ibu-store-badges {
+    margin-top: 1.5rem;
+}
+
+.ibu-carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.ibu-carousel-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    transition: background-color 0.2s;
+}
+
+.ibu-carousel-button:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.ibu-carousel-button svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.ibu-slide-label {
+    min-width: 9rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.ibu-carousel-dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.375rem;
+    margin-top: 1rem;
+}
+
+.ibu-carousel-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.35);
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.ibu-carousel-dot[aria-current="true"] {
+    width: 1.5rem;
+    background: var(--orange-400);
+}
+
+.ibu-carousel-stage {
+    position: relative;
+    height: clamp(340px, 46vw, 470px);
+    margin-top: 1.25rem;
+    overflow: hidden;
+}
+
+.ibu-carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: clamp(180px, 22vw, 230px);
+    transform: translateX(-50%);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s;
+}
+
+.ibu-carousel-slide[data-offset="0"] {
+    z-index: 3;
+}
+
+.ibu-carousel-slide[data-offset="-1"] {
+    z-index: 2;
+    opacity: 0.45;
+    transform: translateX(-118%) scale(0.86) translateY(4%);
+}
+
+.ibu-carousel-slide[data-offset="1"] {
+    z-index: 2;
+    opacity: 0.45;
+    transform: translateX(18%) scale(0.86) translateY(4%);
+}
+
+.ibu-carousel-slide[data-offset="hidden"] {
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ibu-carousel-slide .ibu-phone {
+    box-shadow:
+        inset 0 0 0 1.5px #4a5058,
+        0 30px 50px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Admission ---------- */
+.ibu-admission-card {
+    position: relative;
+    display: grid;
+    align-items: end;
+    gap: 2rem;
+    overflow: hidden;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background:
+        radial-gradient(30rem 20rem at 100% 0%, rgba(245, 132, 42, 0.14), transparent 70%),
+        var(--surface);
+}
+
+@media (min-width: 1024px) {
+    .ibu-admission-card {
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+}
+
+.ibu-admission-head,
+.ibu-admission-body {
+    position: relative;
+}
+
+.ibu-admission-head h2 {
+    margin-top: 1rem;
+}
+
+.ibu-admission-body p {
+    line-height: 1.7;
+}
+
+.ibu-admission-seal {
+    position: absolute;
+    right: -6rem;
+    top: -6rem;
+    width: 22rem;
+    height: 22rem;
+    opacity: 0.07;
+    pointer-events: none;
+}
+
+.ibu-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.ibu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.35rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.ibu-button:hover {
+    transform: translateY(-2px);
+}
+
+.ibu-button-orange {
+    background: var(--orange-500);
+    color: #fff;
+    box-shadow: 0 10px 22px -12px rgba(245, 132, 42, 0.9);
+}
+
+.ibu-button-orange:hover {
+    background: var(--orange-600);
+}
+
+.ibu-button-surface {
+    background: var(--surface-soft);
+    border-color: var(--border);
+    color: var(--heading);
+}
+
+.ibu-button-blue {
+    margin-top: 1.5rem;
+    background: var(--blue-600);
+    color: #fff;
+    box-shadow: 0 10px 22px -12px rgba(0, 128, 207, 0.9);
+}
+
+.ibu-button-blue:hover {
+    background: var(--blue-700);
+}
+
+/* ---------- Overview ---------- */
+.ibu-two-col {
+    display: grid;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.ibu-two-col-top {
+    align-items: start;
+}
+
+@media (min-width: 1024px) {
+    .ibu-two-col {
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+
+    .ibu-two-col-top {
+        gap: 4rem;
+    }
+}
+
+.ibu-overview {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background:
+        linear-gradient(0deg, rgba(6, 45, 75, 0.85), rgba(6, 45, 75, 0.15) 60%),
+        url("https://ibu-assets.bicol-u.edu.ph/assets/img/branding/Bicol_University.webp") center / 42% no-repeat,
+        linear-gradient(135deg, var(--blue-700), var(--blue-950));
+    box-shadow: var(--shadow);
+}
+
+.ibu-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 999px;
+    background: var(--orange-500);
+    color: #fff;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 10px rgba(245, 132, 42, 0.25);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.ibu-play-button svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-left: 0.2rem;
+}
+
+.ibu-overview:hover .ibu-play-button {
+    transform: translate(-50%, -50%) scale(1.08);
+    box-shadow: 0 0 0 16px rgba(245, 132, 42, 0.2);
+}
+
+.ibu-overview-label {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--blue-100);
+}
+
+/* ---------- Announcements ---------- */
+.ibu-section-intro {
+    max-width: 42rem;
+}
+
+.ibu-section-intro h2 {
+    margin-top: 0.75rem;
+}
+
+.ibu-section-intro p.ibu-muted {
+    margin-top: 0.75rem;
+    line-height: 1.7;
+}
+
+.ibu-announcement-grid {
+    display: grid;
+    gap: 18px;
+    margin-top: 2.25rem;
+}
+
+@media (min-width: 768px) {
+    .ibu-announcement-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.ibu-announcement {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: clamp(1.75rem, 3vw, 2rem);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.ibu-announcement:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+    border-color: var(--blue-300);
+}
+
+.ibu-announcement h3 {
+    font-size: 1.25rem;
+}
+
+.ibu-announcement p {
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.ibu-announcement-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    background: var(--blue-100);
+    color: var(--blue-700);
+}
+
+:root.dark .ibu-announcement-icon {
+    background: rgba(0, 161, 242, 0.15);
+    color: var(--blue-300);
+}
+
+.ibu-announcement-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.ibu-text-link {
+    margin-top: auto;
+    padding-top: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* ---------- Help center ---------- */
+.ibu-help-section {
+    margin-top: clamp(3.5rem, 8vw, 6rem);
+    padding-bottom: clamp(3.5rem, 8vw, 6rem);
+    background: var(--surface-soft);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.ibu-help-text {
+    margin-top: 1rem;
+    line-height: 1.7;
+}
+
+.ibu-directory {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
+.ibu-directory-heading {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.ibu-contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-top: 0.625rem;
+}
+
+.ibu-contact-grid {
+    display: grid;
+    gap: 0.625rem;
+    margin-top: 0.625rem;
+}
+
+@media (min-width: 640px) {
+    .ibu-contact-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.ibu-contact-card {
+    display: block;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.ibu-contact-card:hover {
+    border-color: var(--blue-400);
+    transform: translateY(-2px);
+}
+
+.ibu-contact-email {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.ibu-contact-email > span {
+    min-width: 0;
+}
+
+.ibu-contact-email svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    color: var(--accent);
+}
+
+.ibu-contact-name {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--heading);
+}
+
+.ibu-contact-value {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    word-break: break-all;
+}
+
+.ibu-contact-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.ibu-contact-number {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--heading);
+}
+
+/* ---------- Footer ---------- */
+.ibu-footer {
+    padding: 3.5rem 0 2rem;
+    background: var(--blue-950);
+    color: #c4d6e4;
+}
+
+:root.dark .ibu-footer {
+    background: #0a0c0e;
+}
+
+.ibu-footer-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+@media (min-width: 640px) {
+    .ibu-footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1024px) {
+    .ibu-footer-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.ibu-footer-seals {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ibu-dpo-seal {
+    height: 7rem;
+    width: auto;
+    flex-shrink: 0;
+}
+
+.ibu-bu-seal {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.ibu-footer h3 {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0;
+}
+
+.ibu-footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+    margin-top: 0.75rem;
+}
+
+.ibu-footer a {
+    font-size: 0.875rem;
+    transition: color 0.2s;
+}
+
+.ibu-footer a:hover {
+    color: var(--orange-400);
+}
+
+.ibu-footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.82rem;
+}
+
+.ibu-footer-bottom nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+}
+
+/* ---------- Cookie banner ---------- */
+.ibu-cookie {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 50;
+    padding: 1rem;
+    animation: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+    from {
+        transform: translateY(100%);
+    }
+}
+
+.ibu-cookie-panel {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 1.5rem;
+    border-radius: 0.6rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.ibu-cookie-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.ibu-cookie-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.ibu-cookie-title svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--orange-500);
+}
+
+.ibu-cookie-title h3 {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.ibu-cookie-close {
+    border: 0;
+    background: none;
+    padding: 0.25rem;
+    color: var(--muted);
+}
+
+.ibu-cookie-close svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.ibu-cookie p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+.ibu-cookie p a {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.ibu-cookie-details {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.ibu-cookie-details label {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.ibu-cookie-details input {
+    margin-top: 0.2rem;
+    accent-color: var(--blue-600);
+}
+
+.ibu-cookie-details strong {
+    color: var(--heading);
+    font-weight: 500;
+}
+
+.ibu-cookie-details em {
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 0.25rem;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    font-size: 0.72rem;
+    font-style: normal;
+    color: var(--muted);
+}
+
+.ibu-cookie-details small {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.ibu-cookie-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1rem;
+}
+
+@media (min-width: 640px) {
+    .ibu-cookie-actions {
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+}
+
+.ibu-cookie-btn {
+    padding: 0.55rem 1.4rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface-soft);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+    transition: background-color 0.2s;
+}
+
+.ibu-cookie-btn:hover {
+    background: var(--border);
+}
+
+.ibu-cookie-btn-primary {
+    border-color: transparent;
+    background: var(--blue-600);
+    color: #fff;
+}
+
+.ibu-cookie-btn-primary:hover {
+    background: var(--blue-700);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+}

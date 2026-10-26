@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>iBU</title>
+    <meta
+        name="description"
+        content="Access Bicol University online services through iBU, the integrated information system for students, faculty, staff, and applicants. Find official updates, support channels, and university resources in one platform."
+    />
+    <link rel="icon" type="image/webp" href="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/Bicol_University.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+        // Apply the saved theme before first paint to avoid a flash.
+        (function () {
+            var theme = 'auto';
+            try { theme = localStorage.getItem('theme') || 'auto'; } catch (e) {}
+            var dark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', dark);
+            document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        })();
+    </script>
+</head>
+<body>
+<main class="ibu-home">
+    <!-- Hero -->
+    <section class="ibu-hero" aria-labelledby="guest-home-title">
+        <header class="ibu-container ibu-header">
+            <a href="https://ibu.bicol-u.edu.ph" aria-label="iBU home" class="ibu-logo">
+                <img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/ibu-dark.webp" alt="iBU" class="logo-light" width="192" height="76" />
+                <img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/ibu.webp" alt="iBU" class="logo-dark" width="192" height="76" />
+            </a>
+            <nav aria-label="Main navigation" class="ibu-desktop-nav">
+                <a href="https://ibu.bicol-u.edu.ph" aria-current="page">Home</a>
+                <a href="https://ibu.bicol-u.edu.ph/admission-requirements">Admission</a>
+                <a href="https://ibu.bicol-u.edu.ph/health-services-schedules">Health Services</a>
+                <a href="#app">iBU App</a>
+                <a href="https://ibu.bicol-u.edu.ph/faq">FAQ</a>
+            </nav>
+            <div class="ibu-header-actions">
+                <button type="button" data-theme-toggle role="switch" aria-checked="false" aria-label="Switch to dark mode" class="ibu-icon-button">
+                    <svg class="icon-moon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
+                    <svg class="icon-sun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
+                </button>
+                <a href="https://ibu.bicol-u.edu.ph/sign-in" class="ibu-sign-in">Sign in <span aria-hidden="true">↗</span></a>
+                <button type="button" data-menu-toggle aria-label="Open navigation" aria-controls="mobile-navigation" aria-expanded="false" class="ibu-icon-button ibu-menu-button">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                </button>
+            </div>
+            <nav id="mobile-navigation" aria-label="Mobile navigation" class="ibu-mobile-nav" hidden>
+                <a href="https://ibu.bicol-u.edu.ph" aria-current="page">Home</a>
+                <a href="https://ibu.bicol-u.edu.ph/admission-requirements">Admission</a>
+                <a href="https://ibu.bicol-u.edu.ph/health-services-schedules">Health Services</a>
+                <a href="#app">iBU App</a>
+                <a href="https://ibu.bicol-u.edu.ph/faq">FAQ</a>
+            </nav>
+        </header>
+
+        <div class="ibu-container ibu-hero-content">
+            <span class="ibu-watermark" aria-hidden="true">iBU</span>
+            <span class="ibu-launch-pill">
+                <span class="ibu-launch-new">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9 4.5a.75.75 0 0 1 .721.544l.813 2.846a3.75 3.75 0 0 0 2.576 2.576l2.846.813a.75.75 0 0 1 0 1.442l-2.846.813a3.75 3.75 0 0 0-2.576 2.576l-.813 2.846a.75.75 0 0 1-1.442 0l-.813-2.846a3.75 3.75 0 0 0-2.576-2.576l-2.846-.813a.75.75 0 0 1 0-1.442l2.846-.813A3.75 3.75 0 0 0 7.466 7.89l.813-2.846A.75.75 0 0 1 9 4.5ZM18 1.5a.75.75 0 0 1 .728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 0 1 0 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 0 1-1.456 0l-.258-1.036a2.625 2.625 0 0 0-1.91-1.91l-1.036-.258a.75.75 0 0 1 0-1.456l1.036-.258a2.625 2.625 0 0 0 1.91-1.91l.258-1.036A.75.75 0 0 1 18 1.5ZM16.5 15a.75.75 0 0 1 .712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 0 1 0 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 0 1-1.422 0l-.395-1.183a1.5 1.5 0 0 0-.948-.948l-1.183-.395a.75.75 0 0 1 0-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0 1 16.5 15Z" clip-rule="evenodd"/></svg>
+                    NEW
+                </span>
+                Available on Google Play &amp; the App Store
+            </span>
+            <h1 id="guest-home-title">One BU, One Platform, Every BUeño.</h1>
+            <p class="ibu-hero-description">
+                The official Bicol University app puts your library pass, class schedules, campus Wi-Fi and academic
+                records on your phone.
+            </p>
+            <div class="ibu-store-badges">
+                <a href="https://apps.apple.com/ph/app/ibu-portal/id6805265665" class="ibu-store-badge" aria-label="Download on the App Store: iBU">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.8zM14.1 5.8c.6-.8 1.1-1.8 1-2.9-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2.1-.5 2.7-1.3z"/></svg>
+                    <span><span class="ibu-store-caption">Download on the</span><span class="ibu-store-name">App Store</span></span>
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=ph.edu.bicol_u.icto.bu_portal_app&amp;pcampaignid=web_share" class="ibu-store-badge" aria-label="Get it on Google Play: iBU">
+                    <svg viewBox="0 0 24 26" aria-hidden="true">
+                        <path d="M1.2.6C.9.9.7 1.4.7 2v22c0 .6.2 1.1.5 1.4L13.5 13 1.2.6z" fill="#4285f4"/>
+                        <path d="M17.6 17.1L13.5 13 1.2 25.4c.5.5 1.2.5 2 .1l14.4-8.4z" fill="#ea4335"/>
+                        <path d="M17.6 8.9L3.2.5C2.4.1 1.7.1 1.2.6L13.5 13l4.1-4.1z" fill="#34a853"/>
+                        <path d="M22.4 11.7l-4.8-2.8L13.5 13l4.1 4.1 4.8-2.8c1.4-.8 1.4-1.8 0-2.6z" fill="#fbbc04"/>
+                    </svg>
+                    <span><span class="ibu-store-caption">Get it on</span><span class="ibu-store-name">Google Play</span></span>
+                </a>
+            </div>
+            <p class="ibu-hero-note">For Bicol University students · Sign in with your BU account</p>
+
+            <div class="ibu-hero-preview">
+                <div class="ibu-phone ibu-hero-phone">
+                    <div class="ibu-phone-screen">
+                        <img
+                            src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/home-480.webp"
+                            srcset="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/home-480.webp 480w, https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/home-640.webp 640w, https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/home-960.webp 960w"
+                            sizes="(min-width: 1000px) 320px, (min-width: 677px) calc(34vw - 20px), 210px"
+                            alt="iBU Home screen" width="2412" height="5244" fetchpriority="high"
+                        />
+                        <span class="ibu-phone-island" aria-hidden="true"></span>
+                    </div>
+                </div>
+                <div class="ibu-floating-card ibu-floating-library">
+                    <span class="ibu-floating-icon">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z"/></svg>
+                    </span>
+                    <div>
+                        <p class="ibu-floating-title">Library QR pass</p>
+                        <p class="ibu-muted ibu-floating-text">Scan in at any BU library, every campus</p>
+                    </div>
+                </div>
+                <div class="ibu-floating-card ibu-floating-cor">
+                    <span class="ibu-floating-icon ibu-orange-icon">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                    </span>
+                    <div>
+                        <p class="ibu-floating-title">COR ready</p>
+                        <p class="ibu-muted ibu-floating-text">Download this and past semesters</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ibu-hero-fade" aria-hidden="true"></div>
+    </section>
+
+    <!-- College, campus and institute seals -->
+    <section class="ibu-seals" aria-label="BU colleges, campuses and institutes">
+        <p class="ibu-container ibu-seals-title">One app across every BU college, campus &amp; institute</p>
+        <div class="ibu-marquee">
+            <div class="ibu-marquee-track" data-marquee-track>
+                <ul class="ibu-seal-group">
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CS-136.webp" alt="BU CS seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CAL-136.webp" alt="BU CAL seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CBEM-136.webp" alt="BU CBEM seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CDM-136.webp" alt="BU CDM seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CE-136.webp" alt="BU CE seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CENG-136.webp" alt="BU CENG seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CIT-136.webp" alt="BU CIT seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CL-136.webp" alt="BU CL seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CM-136.webp" alt="BU CM seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CN-136.webp" alt="BU CN seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/CSSP-136.webp" alt="BU CSSP seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/GS-136.webp" alt="BU GS seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/Gubat-136.webp" alt="BU Gubat seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/Guinobatan-136.webp" alt="BU Guinobatan seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/IDeA-136.webp" alt="BU IDeA seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/IPESR-136.webp" alt="BU IPESR seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/JMRIGD-136.webp" alt="BU JMRIGD seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/OU-136.webp" alt="BU OU seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/Polangui-136.webp" alt="BU Polangui seal" width="68" height="68" loading="lazy" /></li>
+                    <li><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/Tabaco-136.webp" alt="BU Tabaco seal" width="68" height="68" loading="lazy" /></li>
+                </ul>
+                <!-- script.js appends an aria-hidden copy of the group so the marquee loops seamlessly -->
+            </div>
+        </div>
+    </section>
+
+    <!-- iBU app -->
+    <section id="app" class="ibu-container ibu-section" aria-labelledby="guest-app-title">
+        <div class="ibu-feature-layout">
+            <div>
+                <p class="ibu-eyebrow">iBU FOR STUDENTS</p>
+                <h2 id="guest-app-title">Everything you need on campus, in your pocket.</h2>
+                <div class="ibu-feature-grid">
+                    <div class="ibu-feature-card">
+                        <span class="ibu-feature-number">01</span>
+                        <h3>Library QR access</h3>
+                        <p class="ibu-muted">One QR pass for every BU library across all campuses.</p>
+                    </div>
+                    <div class="ibu-feature-card">
+                        <span class="ibu-feature-number">02</span>
+                        <h3>Class schedules</h3>
+                        <p class="ibu-muted">See your weekly class schedule anytime.</p>
+                    </div>
+                    <div class="ibu-feature-card">
+                        <span class="ibu-feature-number">03</span>
+                        <h3>Eduroam Wi-Fi</h3>
+                        <p class="ibu-muted">Internet access at BU Main Campus.</p>
+                    </div>
+                    <div class="ibu-feature-card">
+                        <span class="ibu-feature-number">04</span>
+                        <h3>Certificate of Registration</h3>
+                        <p class="ibu-muted">Download your COR for the current and previous semesters.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ibu-app-card" data-app-carousel role="region" aria-roledescription="carousel" aria-label="iBU app screens">
+                <h3>Meet the iBU App</h3>
+                <div class="ibu-store-badges">
+                    <a href="https://apps.apple.com/ph/app/ibu-portal/id6805265665" class="ibu-store-badge" aria-label="Download on the App Store: iBU">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.8zM14.1 5.8c.6-.8 1.1-1.8 1-2.9-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2.1-.5 2.7-1.3z"/></svg>
+                        <span><span class="ibu-store-caption">Download on the</span><span class="ibu-store-name">App Store</span></span>
+                    </a>
+                    <a href="https://play.google.com/store/apps/details?id=ph.edu.bicol_u.icto.bu_portal_app&amp;pcampaignid=web_share" class="ibu-store-badge" aria-label="Get it on Google Play: iBU">
+                        <svg viewBox="0 0 24 26" aria-hidden="true">
+                            <path d="M1.2.6C.9.9.7 1.4.7 2v22c0 .6.2 1.1.5 1.4L13.5 13 1.2.6z" fill="#4285f4"/>
+                            <path d="M17.6 17.1L13.5 13 1.2 25.4c.5.5 1.2.5 2 .1l14.4-8.4z" fill="#ea4335"/>
+                            <path d="M17.6 8.9L3.2.5C2.4.1 1.7.1 1.2.6L13.5 13l4.1-4.1z" fill="#34a853"/>
+                            <path d="M22.4 11.7l-4.8-2.8L13.5 13l4.1 4.1 4.8-2.8c1.4-.8 1.4-1.8 0-2.6z" fill="#fbbc04"/>
+                        </svg>
+                        <span><span class="ibu-store-caption">Get it on</span><span class="ibu-store-name">Google Play</span></span>
+                    </a>
+                </div>
+                <div class="ibu-carousel-controls">
+                    <button type="button" class="ibu-carousel-button" data-carousel-previous aria-label="Previous screen">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                    </button>
+                    <p class="ibu-slide-label" data-carousel-label>Home</p>
+                    <button type="button" class="ibu-carousel-button" data-carousel-next aria-label="Next screen">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                    </button>
+                </div>
+                <div class="ibu-carousel-dots" aria-label="Choose an app screen" data-carousel-dots></div>
+                <div class="ibu-carousel-stage" data-carousel-stage>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Home">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/home-480.webp" alt="iBU Home screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Class schedules">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/schedules-480.webp" alt="iBU Class schedules screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Digital ID">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/digital-id-480.webp" alt="iBU Digital ID screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Grades">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/grades-480.webp" alt="iBU Grades screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Assessment">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/assessment-480.webp" alt="iBU Assessment screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Accounts">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/accounts-480.webp" alt="iBU Accounts screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Faculty evaluation">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/evaluation-480.webp" alt="iBU Faculty evaluation screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                    <div class="ibu-carousel-slide" data-carousel-slide data-label="Profile">
+                        <div class="ibu-phone"><div class="ibu-phone-screen"><img src="https://ibu-assets.bicol-u.edu.ph/assets/img/ibu-app/profile-480.webp" alt="iBU Profile screen" width="2412" height="5244" loading="lazy" /><span class="ibu-phone-island" aria-hidden="true"></span></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admission -->
+    <section class="ibu-container ibu-section" aria-labelledby="guest-admission-title">
+        <div class="ibu-admission-card">
+            <img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/Bicol_University.webp" alt="" aria-hidden="true" class="ibu-admission-seal" width="447" height="447" loading="lazy" />
+            <div class="ibu-admission-head">
+                <p class="ibu-eyebrow">Bicol University</p>
+                <h2 id="guest-admission-title">The Premier State University in the Bicol Region</h2>
+            </div>
+            <div class="ibu-admission-body">
+                <p class="ibu-muted">
+                    Access online services through one consistent platform for Bicol University students, faculty,
+                    staff, and applicants.
+                </p>
+                <div class="ibu-button-row">
+                    <a href="https://ibu.bicol-u.edu.ph/sign-up" class="ibu-button ibu-button-orange">Submit application <span aria-hidden="true">→</span></a>
+                    <a href="https://ibu.bicol-u.edu.ph/admission-requirements" class="ibu-button ibu-button-surface">Admission requirements</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview -->
+    <section class="ibu-container ibu-section" aria-labelledby="guest-overview-title">
+        <div class="ibu-two-col">
+            <div>
+                <p class="ibu-eyebrow">Overview</p>
+                <h2 id="guest-overview-title">We are committed to providing quality education for all students.</h2>
+            </div>
+            <a href="https://www.youtube.com/watch?v=P_vExmeHJvI" target="_blank" rel="noopener noreferrer" class="ibu-overview" aria-label="Play the overview: Bicol University on YouTube (opens in a new tab)">
+                <span class="ibu-play-button">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd"/></svg>
+                </span>
+                <span class="ibu-overview-label">Play the overview <span aria-hidden="true">↗</span></span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Announcements -->
+    <section class="ibu-container ibu-section" aria-labelledby="guest-announcements-title">
+        <div class="ibu-section-intro">
+            <p class="ibu-eyebrow">Latest Announcements</p>
+            <h2 id="guest-announcements-title">Official university updates</h2>
+            <p class="ibu-muted">Follow BU’s primary channels for public notices, university-wide advisories, and community updates.</p>
+        </div>
+        <div class="ibu-announcement-grid">
+            <a href="https://bicol-u.edu.ph/" target="_blank" rel="noopener noreferrer" class="ibu-announcement">
+                <span class="ibu-announcement-icon">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"/></svg>
+                </span>
+                <h3>Official Website</h3>
+                <p class="ibu-muted">Visit the official Bicol University website for university-wide updates.</p>
+                <span class="ibu-text-link">Open link <span aria-hidden="true">↗</span></span>
+            </a>
+            <a href="https://www.facebook.com/BicolUniversity" target="_blank" rel="noopener noreferrer" class="ibu-announcement">
+                <span class="ibu-announcement-icon">
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"/></svg>
+                </span>
+                <h3>Facebook Page</h3>
+                <p class="ibu-muted">Follow the official Bicol University Facebook page for the latest announcements.</p>
+                <span class="ibu-text-link">Open link <span aria-hidden="true">↗</span></span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Help center -->
+    <section class="ibu-help-section ibu-section" aria-labelledby="guest-help-title">
+        <div class="ibu-container ibu-two-col ibu-two-col-top">
+            <div>
+                <p class="ibu-eyebrow">Help Center</p>
+                <h2 id="guest-help-title">Have questions or need assistance? We're here to help!</h2>
+                <p class="ibu-muted ibu-help-text">
+                    Reach the appropriate office through the official support link, email addresses, and contact
+                    numbers below.
+                </p>
+                <a href="https://icto.bicol-u.edu.ph" target="_blank" rel="noopener noreferrer" class="ibu-button ibu-button-blue">Technical Support <span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="ibu-directory">
+                <div>
+                    <h3 class="ibu-directory-heading">Emails</h3>
+                    <div class="ibu-contact-list">
+                        <a href="mailto:ictohelpdesk@bicol-u.edu.ph" class="ibu-contact-card ibu-contact-email">
+                            <span><span class="ibu-contact-name">ICTO Support</span><span class="ibu-muted ibu-contact-value">ictohelpdesk@bicol-u.edu.ph</span></span>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                        </a>
+                        <a href="mailto:bu-admission@bicol-u.edu.ph" class="ibu-contact-card ibu-contact-email">
+                            <span><span class="ibu-contact-name">Admissions Office</span><span class="ibu-muted ibu-contact-value">bu-admission@bicol-u.edu.ph</span></span>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                        </a>
+                        <a href="mailto:bu-clinic@bicol-u.edu.ph" class="ibu-contact-card ibu-contact-email">
+                            <span><span class="ibu-contact-name">Health Services</span><span class="ibu-muted ibu-contact-value">bu-clinic@bicol-u.edu.ph</span></span>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="ibu-directory-heading">Contact Numbers</h3>
+                    <div class="ibu-contact-grid">
+                        <a href="tel:09562253405" class="ibu-contact-card">
+                            <span class="ibu-muted ibu-contact-label">ICTO Main Line · Globe</span>
+                            <span class="ibu-contact-number">0956 225 3405</span>
+                        </a>
+                        <a href="tel:09472507752" class="ibu-contact-card">
+                            <span class="ibu-muted ibu-contact-label">ICTO Secondary Line · Smart</span>
+                            <span class="ibu-contact-number">0947 250 7752</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="ibu-footer">
+        <div class="ibu-container">
+            <div class="ibu-footer-grid">
+                <div class="ibu-footer-seals">
+                    <img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/dpo-seal.webp" alt="Data Privacy Officer Seal" width="582" height="1082" class="ibu-dpo-seal" loading="lazy" />
+                    <img src="https://ibu-assets.bicol-u.edu.ph/assets/img/branding/seal/Bicol_University.webp" alt="Bicol University seal" width="481" height="481" class="ibu-bu-seal" loading="lazy" />
+                </div>
+                <div>
+                    <h3>Admissions Office</h3>
+                    <div class="ibu-footer-links">
+                        <a href="https://ibu.bicol-u.edu.ph/admission/application">Application Form</a>
+                        <a href="https://ibu.bicol-u.edu.ph/admission-requirements">Admission Requirements</a>
+                    </div>
+                </div>
+                <div>
+                    <h3>University Health Services</h3>
+                    <div class="ibu-footer-links">
+                        <a href="https://ibu.bicol-u.edu.ph/health-services-schedules">Medical Schedule</a>
+                        <a href="https://ibu.bicol-u.edu.ph/health-services/requirements">Download Requirements</a>
+                    </div>
+                </div>
+                <div>
+                    <h3>University Registrar</h3>
+                    <div class="ibu-footer-links">
+                        <a href="https://ibu.bicol-u.edu.ph/university-events">Events</a>
+                        <a href="https://ibu.bicol-u.edu.ph/enrollment-requirements">Download Requirements</a>
+                    </div>
+                </div>
+                <div>
+                    <h3>System Concerns</h3>
+                    <div class="ibu-footer-links">
+                        <a href="https://icto.bicol-u.edu.ph" target="_blank" rel="noopener noreferrer">Technical Support</a>
+                    </div>
+                </div>
+            </div>
+            <div class="ibu-footer-bottom">
+                <p>© 2026 Bicol University Integrated Information System. All rights reserved.</p>
+                <nav aria-label="Legal and privacy">
+                    <a href="https://ibu.bicol-u.edu.ph/terms-of-use">Terms</a>
+                    <a href="https://bicol-u.edu.ph/privacy-statement/">Privacy</a>
+                    <a href="https://ibu.bicol-u.edu.ph/cookie-settings">Cookies</a>
+                    <a href="https://ibu.bicol-u.edu.ph/cookie-policy">Cookie Policy</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+</main>
+
+<!-- Cookie consent banner -->
+<div class="ibu-cookie" role="dialog" aria-labelledby="cookie-consent-title" aria-describedby="cookie-consent-description" data-cookie-banner hidden>
+    <div class="ibu-cookie-panel">
+        <div class="ibu-cookie-head">
+            <div class="ibu-cookie-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                <h3 id="cookie-consent-title">Cookie Preferences</h3>
+            </div>
+            <button type="button" class="ibu-cookie-close" data-cookie-accept-all aria-label="Accept all cookies and close banner">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <p id="cookie-consent-description">
+            We use cookies and similar technologies to enhance your browsing experience, analyze site traffic, and
+            provide personalized content. By clicking "Accept All", you consent to our use of cookies. You can manage
+            your preferences or learn more about our data practices in our
+            <a href="https://bicol-u.edu.ph/privacy-statement/">Privacy Policy</a>.
+        </p>
+        <div class="ibu-cookie-details" data-cookie-details hidden>
+            <label><input type="checkbox" checked disabled /> <span><strong>Essential Cookies</strong> <em>Required</em><small>These cookies are necessary for the website to function and cannot be switched off.</small></span></label>
+            <label><input type="checkbox" data-cookie-pref="analytics" checked /> <span><strong>Analytics Cookies</strong><small>Help us understand how visitors interact with our website by collecting anonymous information.</small></span></label>
+            <label><input type="checkbox" data-cookie-pref="marketing" /> <span><strong>Marketing Cookies</strong><small>Used to track visitors across websites to display relevant and engaging advertisements.</small></span></label>
+            <label><input type="checkbox" data-cookie-pref="functional" checked /> <span><strong>Functional Cookies</strong><small>Enable enhanced functionality and personalization, such as videos and live chat.</small></span></label>
+        </div>
+        <div class="ibu-cookie-actions">
+            <button type="button" class="ibu-cookie-btn" data-cookie-toggle aria-expanded="false">Customize</button>
+            <button type="button" class="ibu-cookie-btn" data-cookie-accept-selected>Accept Selected</button>
+            <button type="button" class="ibu-cookie-btn ibu-cookie-btn-primary" data-cookie-accept-all>Accept All</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
