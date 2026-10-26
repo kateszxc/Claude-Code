@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stopwatch Build Layout</title>
+<style>
+:root{--bg:#fff;--fg:#1b1d21;--card:#f3f4f7;--line:#d5d9e0;--mut:#5a6270;--ic:#cfe3ff;--disp:#ffe3b3;--pass:#d9f2d4;--btn:#f6d0d8;--warn:#fff1c2;--bad:#ffd9d9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171b;--fg:#e8eaee;--card:#1f2228;--line:#363b45;--mut:#9aa3b2;--ic:#1f3a5c;--disp:#5c4216;--pass:#26462a;--btn:#5a2633;--warn:#4a3d12;--bad:#5a2222}}
+:root[data-theme="dark"]{--bg:#15171b;--fg:#e8eaee;--card:#1f2228;--line:#363b45;--mut:#9aa3b2;--ic:#1f3a5c;--disp:#5c4216;--pass:#26462a;--btn:#5a2633;--warn:#4a3d12;--bad:#5a2222}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;max-width:1000px;margin:0 auto;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
+h1{font-size:22px;margin:4px 0}h2{font-size:17px;margin:28px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px}
+p,li{color:var(--fg)}small,.mut{color:var(--mut)}
+.note{background:var(--warn);border-radius:8px;padding:10px 12px;margin:10px 0}
+.note.bad{background:var(--bad)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:6px 0}th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}th{background:var(--card)}
+td.n{text-align:right;white-space:nowrap}
+code{background:var(--card);padding:1px 5px;border-radius:4px;font-size:13px}
+.board{margin:12px 0}.board b{display:block;margin-bottom:4px}
+.bb{min-width:720px;width:100%;height:auto;display:block}.pn{font-size:7.5px;text-anchor:middle;fill:var(--fg)}.lb{font-size:9px;font-weight:700;text-anchor:middle;fill:var(--fg)}.cn{font-size:6.5px;fill:var(--mut);text-anchor:middle}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;margin:0 0 14px}
+.chip h3{font-size:14.5px;margin:0 0 10px}.chip h3 span{font-weight:400;color:var(--mut);font-size:12px}
+.hc{display:grid;grid-template-columns:repeat(var(--k),minmax(100px,1fr));gap:4px;min-width:calc(var(--k)*104px)}
+.pc{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px;text-align:center;font-size:11px;line-height:1.25;display:flex;flex-direction:column;gap:2px;align-items:center}
+.pc.t{justify-content:flex-end}.pc i{background:var(--fg);color:var(--bg);border-radius:4px;min-width:20px;font-style:normal;font-weight:700}
+.pc b{font-size:12px}.pc span{color:var(--mut)}
+.hc .body{grid-column:1/-1;position:relative;border:2px solid var(--fg);border-radius:6px;padding:6px 18px;text-align:center;font-weight:700;background:var(--bg)}
+.hc .body::before{content:"";position:absolute;left:-2px;top:50%;width:10px;height:20px;margin-top:-10px;border:2px solid var(--fg);border-left:0;border-radius:0 10px 10px 0;background:var(--card)}
+.hc .body::after{content:"";position:absolute;left:8px;bottom:4px;width:7px;height:7px;border-radius:50%;background:var(--fg)}
+.bn{font-size:13.5px;margin:6px 0 4px;padding:8px 10px;background:var(--card);border-radius:8px}.bn ul{margin:4px 0 0 18px;padding:0}.pl{font-size:6px;fill:var(--fg)}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-width:360px}.seg div{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:4px;text-align:center;font-size:12px}
+.seg b{display:block}
+ol li,ul li{margin:2px 0}
+</style></head><body>
+<h1>6-digit stopwatch: build layout</h1>
+<p class="mut">MM:SS:CS · 3 × CD4518 counters, 6 × CD4511 drivers, NE555 clock at 100 Hz · 4 breadboards (830 points, 63 columns) · the notch of every IC points left, so pin 1 is bottom-left.</p>
+<div class="note"><b>Before wiring:</b> read the part number printed on every chip. Both of your 74HC listings are multi-variant listings. A 74HC73 is not a drop-in for the 74HC74, because its pinout is different. A 74HCT part works fine. The column numbers below are a suggested placement, not a rule.</div>
+
+<h2>1. How it behaves (corrected spec)</h2>
+<p>One 74HC74 flip-flop has only two states, RUN and STOP. Q drives the green LED and /Q drives the red LED, so exactly one LED is always lit. The original spec said “all LEDs off” after power-on and reset, which this hardware can’t do. Use this version in your write-up:</p>
+<div class="scroll"><table>
+<tr><th>Event</th><th>Input</th><th>Display</th><th>LEDs</th></tr>
+<tr><td>Power on</td><td>Button A = the power bank’s own switch</td><td>00:00:00 (power-on reset, about 0.1 s)</td><td>Red on, green off: “stopped at zero”</td></tr>
+<tr><td>Start</td><td>Button B</td><td>Counts up 00:00:01 → … → 59:59:99, then wraps to 00:00:00</td><td>Green on, red off</td></tr>
+<tr><td>Stop</td><td>Button B</td><td>Freezes at the current time</td><td>Red on, green off</td></tr>
+<tr><td>Resume</td><td>Button B</td><td>Continues from the frozen time</td><td>Green on, red off</td></tr>
+<tr><td>Reset (any time)</td><td>Button C</td><td>00:00:00 immediately</td><td>Red on, green off; press B to start again</td></tr>
+</table></div>
+<p class="mut">Pressing B on a clock edge can add or drop one count (10 ms), which is acceptable. Real centisecond accuracy depends on trimming the 555 (section 8). An untrimmed clock can be off by about 20%.</p>
+
+<h2>2. Parts check (against your order)</h2>
+<div class="scroll"><table>
+<tr><th>Part</th><th>Need</th><th>Where</th><th>Status</th></tr>
+<tr><td>CD4518 dual BCD counter</td><td class="n">3</td><td>Board 1</td><td><b>Replaces the 3 × 74HC390</b> in the first list. Confirm they’re ordered.</td></tr>
+<tr><td>CD4511 BCD → 7-segment driver</td><td class="n">6</td><td>Boards 2, 3</td><td>Ordered</td></tr>
+<tr><td>NE555P, 74HC14, 74HC08, 74HC32, 74HC74</td><td class="n">1 each</td><td>Board 4</td><td>Ordered (check the markings)</td></tr>
+<tr><td>5161AS display (common cathode)</td><td class="n">6</td><td>Board 1</td><td>Ordered</td></tr>
+<tr><td>330 Ω</td><td class="n">44</td><td>42 segments + 2 LEDs</td><td>44 ordered, no spare. Buy 50 if you can.</td></tr>
+<tr><td>1 kΩ</td><td class="n">2</td><td>555 R1, 555 output pull-up</td><td>5 ordered</td></tr>
+<tr><td>4.7 kΩ</td><td class="n">1</td><td>555 R2</td><td>5 ordered</td></tr>
+<tr><td>100 kΩ</td><td class="n">2</td><td>Button B pull-up, reset pull-down</td><td>2 ordered, no spare. Buy 5 if you can.</td></tr>
+<tr><td>5 kΩ trimpot (“502”)</td><td class="n">1</td><td>In series with R2</td><td>Ordered</td></tr>
+<tr><td>0.1 µF ceramic (104)</td><td class="n">16</td><td>14 IC bypass + 555 CTRL + button B debounce</td><td>20 ordered, 4 spare</td></tr>
+<tr><td>1 µF electrolytic</td><td class="n">2</td><td>555 timing cap, power-on reset</td><td>5 ordered, 3 spare (one is the debounce upgrade, section 8)</td></tr>
+<tr><td>Red LED + green LED</td><td class="n">1 + 1</td><td>Board 4</td><td class="mut"><b>Missing</b>: add to the order</td></tr>
+<tr><td>Push buttons (B, C)</td><td class="n">2</td><td>Board 4</td><td>Provided</td></tr>
+<tr><td>USB breakout board (or a stripped USB cable)</td><td class="n">1</td><td>Board 4 rails</td><td class="mut"><b>Missing</b>: the power bank can’t reach the rails without it</td></tr>
+<tr><td>830-point breadboard</td><td class="n">4</td><td>—</td><td class="mut"><b>Only 3 ordered</b>: buy one more (see below)</td></tr>
+<tr><td>22 AWG solid wire kit</td><td class="n">1</td><td>About 80 long jumpers plus short ones</td><td>Ordered</td></tr>
+</table></div>
+<div class="note bad"><b>Why 4 boards and not 3:</b> 6 displays, 14 ICs and 42 segment resistors need about 200 breadboard columns. Three 830-point boards have 189. Squeezing everything onto three boards leaves no room to route wires, so buy a fourth board.</div>
+
+<h2>3. Boards</h2>
+<p><b>Board 1</b> is the display panel: six displays side by side reading MM:SS:CS, plus the three CD4518 counters. <b>Boards 2 and 3</b> hold the six CD4511 drivers and their 330 Ω resistors, 3 digits each. <b>Board 4</b> is control and carries the USB power breakout. Link every board’s rails with long jumpers, and join each board’s top and bottom rails (+ to +, − to −).</p>
+<div id="boards"></div>
+<p class="mut">Red line = +5 V rail, blue line = GND rail. Rows a–e are the lower half and f–j the upper half. Chips straddle the center gap (rows e/f) with the notch on the left, so the top row counts down from the highest pin. Pin labels: <code>=6</code> = tie to pin 6 of the same chip, <code>08.4</code> = 74HC08 pin 4, <code>#1.14</code> = CD4518 #1 pin 14, <code>nc</code> = leave empty. Green = resistors only. Each bank of seven 330 Ω resistors stands across the center gap and connects only to its own wires (no GND, no +5 V). Put a 0.1 µF ceramic right across the VCC and GND pins of every IC.</p>
+
+<h2>4. Chip pinouts (horizontal, same orientation as on the board)</h2>
+<div id="chips"></div>
+
+<h2>5. Display 5161AS (common cathode, front view)</h2>
+<div class="seg">
+<div><b>10</b>G</div><div><b>9</b>F</div><div><b>8</b>COM→GND</div><div><b>7</b>A</div><div><b>6</b>B</div>
+<div><b>1</b>E</div><div><b>2</b>D</div><div><b>3</b>COM→GND</div><div><b>4</b>C</div><div><b>5</b>DP, unused</div>
+</div>
+<p class="mut">Each segment runs CD4511 output → 330 Ω (on Board 2 or 3) → jumper to the display pin on Board 1. Pins 3 and 8 are joined inside the display, so one of them to GND is enough. The two pin rows are about 15.24 mm (0.6″) apart, twice a chip’s width, so the display can’t sit in rows e/f. Put its pins in <b>rows d and h</b>, then wire into rows a–b and i–j, which the body doesn’t cover. Measure yours first. Before wiring, test each display: COM to GND, then touch each segment pin to +5 V through a 330 Ω resistor.</p>
+
+<h2>6. CD4518 counter chips</h2>
+<div class="scroll"><table>
+<tr><th>Chip (board)</th><th>Counter</th><th>CLOCK (pin 1 / 9)</th><th>ENABLE (pin 2 / 10)</th><th>RESET (pin 7 / 15)</th><th>Outputs</th></tr>
+<tr><td rowspan="2">#1 (B1, CS)</td><td>A: CS units</td><td>CLK_G (74HC08 pin 3)</td><td>+5V</td><td>RESET</td><td>Q0–Q3 → 4511 units; Q3 (pin 6) → pin 10</td></tr>
+<tr><td>B: CS tens</td><td>GND</td><td>A Q3 (pin 6)</td><td>RESET</td><td>Q0–Q3 → 4511 tens; Q3 (pin 14) → #2 pin 2</td></tr>
+<tr><td rowspan="2">#2 (B1, SS)</td><td>A: SS units</td><td>GND</td><td>#1 pin 14</td><td>RESET</td><td>Q0–Q3 → 4511 units; Q3 (pin 6) → pin 10</td></tr>
+<tr><td>B: SS tens, ÷6</td><td>GND</td><td>A Q3 (pin 6)</td><td>74HC32 pin 3</td><td>Q0–Q3 → 4511 tens; Q1, Q2 (pins 12, 13) → 74HC08 pins 4, 5; Q2 (pin 13) → #3 pin 2</td></tr>
+<tr><td rowspan="2">#3 (B1, MM)</td><td>A: MM units</td><td>GND</td><td>#2 pin 13</td><td>RESET</td><td>Q0–Q3 → 4511 units; Q3 (pin 6) → pin 10</td></tr>
+<tr><td>B: MM tens, ÷6</td><td>GND</td><td>A Q3 (pin 6)</td><td>74HC32 pin 6</td><td>Q0–Q3 → 4511 tens; Q1, Q2 (pins 12, 13) → 74HC08 pins 9, 10</td></tr>
+</table></div>
+<p class="mut">Q0, Q1, Q2, Q3 = weights 1, 2, 4, 8 (datasheets print them Q1–Q4). Pin 9 is CLOCK B and pin 10 is ENABLE B. A counter steps on a rising edge of CLOCK while ENABLE is high, or on a falling edge of ENABLE while CLOCK is low. The cascade uses the second mode: CLOCK is tied low, and the previous digit’s Q3 falls on 9→0 (Q2 falls on 6→0 for ÷6), which steps the next digit. CLOCK and ENABLE are <b>not</b> interchangeable in this wiring, because a swapped pair never counts. RESET is active-HIGH. The ÷6 stages count to 6 (0110), then Q1·Q2 resets them to 0 right away, so the 6 never shows.</p>
+
+<h2>7. Long wires</h2>
+<p>The six displays sit side by side on Board 1, so the readout is one panel. The cost is 66 jumpers between Board 1 and Boards 2–3: 24 BCD wires (CD4518 Q0–Q3 → CD4511 pins 7, 1, 2, 6) and 42 segment wires (from each 330 Ω bank to the display pins). Label each bundle by digit.</p>
+<div class="scroll"><table>
+<tr><th>Digit (display on B1, cols)</th><th>Counter on B1</th><th>CD4511 and 330 Ω bank</th></tr>
+<tr><td>MM tens (2–6)</td><td>#3 B (pins 11–14)</td><td>B2, cols 2–17</td></tr>
+<tr><td>MM units (7–11)</td><td>#3 A (pins 3–6)</td><td>B2, cols 20–35</td></tr>
+<tr><td>SS tens (14–18)</td><td>#2 B (pins 11–14)</td><td>B2, cols 38–53</td></tr>
+<tr><td>SS units (19–23)</td><td>#2 A (pins 3–6)</td><td>B3, cols 2–17</td></tr>
+<tr><td>CS tens (26–30)</td><td>#1 B (pins 11–14)</td><td>B3, cols 20–35</td></tr>
+<tr><td>CS units (31–35)</td><td>#1 A (pins 3–6)</td><td>B3, cols 38–53</td></tr>
+</table></div>
+<div class="scroll"><table>
+<tr><th>Signal</th><th>From</th><th>To</th></tr>
+<tr><td>CLK_G</td><td>B4: 74HC08 pin 3</td><td>B1: CD4518 #1 pin 1</td></tr>
+<tr><td>RESET</td><td>B4: 74HC14 pin 8</td><td>B1: #1 pins 7 and 15, #2 pin 7, #3 pin 7</td></tr>
+<tr><td>SS tens Q1, Q2</td><td>B1: #2 pins 12, 13</td><td>B4: 74HC08 pins 4, 5</td></tr>
+<tr><td>MM tens Q1, Q2</td><td>B1: #3 pins 12, 13</td><td>B4: 74HC08 pins 9, 10</td></tr>
+<tr><td>SS tens reset</td><td>B4: 74HC32 pin 3</td><td>B1: #2 pin 15</td></tr>
+<tr><td>MM tens reset</td><td>B4: 74HC32 pin 6</td><td>B1: #3 pin 15</td></tr>
+<tr><td>Power</td><td>B4 rails (USB breakout)</td><td>Rails of B1, B2, B3</td></tr>
+<tr><td class="mut">On Board 1 only</td><td class="mut">#1 pin 14 · #2 pin 13</td><td class="mut">#2 pin 2 · #3 pin 2</td></tr>
+</table></div>
+
+<h2>8. Control board extras</h2>
+<ul>
+<li><b>Button B (start/stop):</b> 100 kΩ from +5 V to the node, 0.1 µF from the node to GND, button from the node to GND, node → 74HC14 pin 3. If one press toggles twice, swap the 0.1 µF for a spare 1 µF (+ to the node, − to GND).</li>
+<li><b>Reset (Button C):</b> 1 µF (+ to +5 V, − to RST_NODE), 100 kΩ from RST_NODE to GND, Button C from RST_NODE to +5 V, RST_NODE → 74HC14 pin 5. At power-up the cap holds RST_NODE high for about 0.1 s, which clears the counters and the flip-flop.</li>
+<li><b>Button legs:</b> a 4-leg tactile button straddling the gap has its legs <i>across</i> the gap joined internally. The switch connects the left column to the right column, so wire one signal to the left column and the other to the right. If unsure, use two diagonally opposite legs.</li>
+<li><b>LEDs:</b> 74HC74 pin 5 → 330 Ω → green LED → GND. Pin 6 → 330 Ω → red LED → GND. The long leg is the + side.</li>
+<li><b>555 output:</b> NE555 HIGH is only about 3.3 V, below a 74HC’s 3.5 V threshold. The 1 kΩ pull-up and the 74HC14 Schmitt input fix that.</li>
+<li><b>555 timing:</b> R1 = 1 kΩ, R2 = 4.7 kΩ + 5 kΩ trimpot, C = 1 µF. f = 1.44 / ((R1 + 2·R2)·C). Target R1 + 2·R2 = 14.4 kΩ, so start with the trimpot near 2 kΩ. The range is about 70–138 Hz, which covers the cap’s ±20% tolerance.</li>
+<li><b>Calibrating:</b> start the stopwatch and a phone stopwatch together, then stop both at exactly 5:00 on the phone. A reading that’s too high means the clock is fast, so turn the trimpot to add resistance. A reading that’s too low means it’s slow, so turn it the other way. Each 1% (3 s per 5 min) is about 72 Ω of trimpot. Repeat until it stays within 0.1 s.</li>
+</ul>
+
+<h2>9. Bring-up order</h2>
+<ol>
+<li>Power and rails on all 4 boards. Check 5 V on every rail with a meter.</li>
+<li>Test all 6 displays (section 5).</li>
+<li>Test the 555 alone: put an LED on its output and a bigger cap in place of the 1 µF so you can see it blink, then put the 1 µF back.</li>
+<li>Build Board 4 fully. Button B should toggle red/green, and Button C should force red.</li>
+<li>Build one digit (CD4518 #1 A + its CD4511 + resistors + display) and confirm it counts 0–9. Only then build the other five.</li>
+<li>Calibrate (section 8).</li>
+</ol>
+
+<script>
+var X=function(c){return 20+(c-1)*12};
+var PL={"NE555":["GND","=6","OUT","5V","C.1","=2","DIS","5V"],
+"74HC14":["555","08.1","Bnode","74.3","Rnode","/RST","GND","RST","/RST","nc","GND","nc","GND","5V"],
+"74HC08":["14.2","RUN","CLK_G","S.Q1","S.Q2","32.2","GND","32.5","M.Q1","M.Q2","nc","GND","GND","5V"],
+"74HC32":["RST","08.6","S.RST","RST","08.8","M.RST","GND","nc","GND","GND","nc","GND","GND","5V"],
+"74HC74":["/RST","=6","14.4","5V","RUN","/Q","GND","nc","nc","5V","GND","GND","5V","5V"],
+"CD4518 #1":["CLK_G","5V","Q0","Q1","Q2","Q3","RST","GND","GND","=6","Q0","Q1","Q2","Q3","RST","5V"],
+"CD4518 #2":["GND","#1.14","Q0","Q1","Q2","Q3","RST","GND","GND","=6","Q0","Q1","Q2","Q3","32.3","5V"],
+"CD4518 #3":["GND","#2.13","Q0","Q1","Q2","Q3","RST","GND","GND","=6","Q0","Q1","Q2","Q3","32.6","5V"],
+"CD4511":["B","C","5V","5V","GND","D","A","GND","e","d","c","b","a","g","f","5V"]};
+function labels(t){return PL[t]||PL[t.split(" ")[0]]||[]}
+function dip(c1,n,t){var lab=labels(t),k=n/2,xs=X(c1),xe=X(c1+k-1),s='<rect x="'+(xs-6)+'" y="96" width="'+(xe-xs+12)+'" height="40" rx="3" fill="var(--ic)" stroke="var(--fg)"/><path d="M'+(xs-6)+' 108a8 8 0 0 1 0 16" fill="var(--bg)" stroke="var(--fg)"/>';
+for(var i=0;i<k;i++){var x=X(c1+i);s+='<rect x="'+(x-2)+'" y="92" width="4" height="6" fill="var(--fg)"/><rect x="'+(x-2)+'" y="134" width="4" height="6" fill="var(--fg)"/><text x="'+x+'" y="107" class="pn">'+(n-i)+'</text><text x="'+x+'" y="129" class="pn">'+(i+1)+'</text><text transform="translate('+(x+2.5)+' 89) rotate(-90)" class="pl">'+(lab[n-i-1]||"")+'</text><text transform="translate('+(x+2.5)+' 145) rotate(90)" class="pl">'+(lab[i]||"")+'</text>'}
+return s+'<text x="'+((xs+xe)/2+5)+'" y="120" class="lb">'+t+'</text>'}
+/* 0.56" display: pin rows 0.6" apart, so pins sit in rows h (y=74) and d (y=146) */
+function disp(c1,t){var xs=X(c1),xe=X(c1+4),s='<rect x="'+(xs-6)+'" y="76" width="'+(xe-xs+12)+'" height="68" rx="4" fill="var(--disp)" stroke="var(--fg)"/>';
+for(var i=0;i<5;i++){var x=X(c1+i);s+='<rect x="'+(x-2)+'" y="70" width="4" height="6" fill="var(--fg)"/><rect x="'+(x-2)+'" y="144" width="4" height="6" fill="var(--fg)"/><text x="'+x+'" y="87" class="pn">'+(10-i)+'</text><text x="'+x+'" y="139" class="pn">'+(i+1)+'</text><text transform="translate('+(x+2.5)+' 67) rotate(-90)" class="pl">'+["G","F","GND","A","B"][i]+'</text><text transform="translate('+(x+2.5)+' 153) rotate(90)" class="pl">'+["E","D","GND","C","–"][i]+'</text>'}
+return s+'<text x="'+((xs+xe)/2)+'" y="114" class="lb">'+t+'</text>'}
+function blk(c1,c2,t,cl){var xs=X(c1),xe=X(c2);return '<rect x="'+(xs-6)+'" y="44" width="'+(xe-xs+12)+'" height="42" rx="4" fill="var(--'+cl+')" stroke="var(--fg)" stroke-dasharray="3 2"/><text x="'+((xs+xe)/2)+'" y="68" class="lb">'+t+'</text>'}
+function board(P){var d="";[14,26,50,62,74,86,98,134,146,158,170,182,202,214].forEach(function(y){for(var c=1;c<=63;c++)d+="M"+X(c)+" "+y+"h0"});
+var h='<svg class="bb" viewBox="0 0 784 228"><rect x="2" y="2" width="780" height="224" rx="8" fill="var(--card)" stroke="var(--line)" stroke-width="2"/><line x1="12" x2="772" y1="8" y2="8" stroke="#d33" stroke-width="2"/><line x1="12" x2="772" y1="32" y2="32" stroke="#38c" stroke-width="2"/><line x1="12" x2="772" y1="196" y2="196" stroke="#38c" stroke-width="2"/><line x1="12" x2="772" y1="220" y2="220" stroke="#d33" stroke-width="2"/><rect x="10" y="106" width="764" height="22" fill="var(--bg)" opacity=".6"/><path d="'+d+'" stroke="var(--mut)" stroke-width="3.4" stroke-linecap="round" opacity=".55"/>';
+for(var c=1;c<=63;c++)if(c==1||c%5==0)h+='<text x="'+X(c)+'" y="42" class="cn">'+c+'</text><text x="'+X(c)+'" y="193" class="cn">'+c+'</text>';
+"jihgf".split("").forEach(function(l,i){h+='<text x="9" y="'+(52+i*12)+'" class="cn">'+l+'</text>'});
+"edcba".split("").forEach(function(l,i){h+='<text x="9" y="'+(136+i*12)+'" class="cn">'+l+'</text>'});
+P.forEach(function(p){h+=p[0]=="dip"?dip(p[1],p[2],p[3]):p[0]=="disp"?disp(p[1],p[2]):p[0]=="colon"?colon(p[1],p[2]):p[0]=="bank"?bank(p[1]):blk(p[1],p[2],p[3],p[4])});
+return h+'</svg>'}
+/* resistor legs in rows g and d: wide enough to bend a 1/4 W lead */
+function bank(c1){var T="fgabcde",D=[9,10,7,6,4,2,1],s='<text x="'+X(c1+3)+'" y="53" class="lb">7×330Ω</text><text x="'+X(c1+3)+'" y="66" class="cn">↑ from 4511 · ↓ to display</text>';
+for(var k=0;k<7;k++){var x=X(c1+k);s+='<rect x="'+(x-3)+'" y="84" width="6" height="64" rx="1" fill="var(--pass)" stroke="var(--fg)"/><text x="'+x+'" y="80" class="pn">'+T[k]+'</text><text x="'+x+'" y="165" class="pn">'+D[k]+'</text>'}return s}
+function colon(c1,c2){var x=(X(c1)+X(c2))/2;return '<circle cx="'+x+'" cy="106" r="3.5" fill="var(--fg)" opacity=".35"/><circle cx="'+x+'" cy="126" r="3.5" fill="var(--fg)" opacity=".35"/>'}
+function drv(a,b,c){return [["dip",2,16,"CD4511 "+a],["bank",11],["dip",20,16,"CD4511 "+b],["bank",29],["dip",38,16,"CD4511 "+c],["bank",47]]}
+var B=[["Board 1: Display panel (MM:SS:CS) + counters",[["disp",2,"M tens"],["disp",7,"M units"],["colon",12,13],["disp",14,"S tens"],["disp",19,"S units"],["colon",24,25],["disp",26,"C tens"],["disp",31,"C units"],["dip",38,16,"CD4518 #3"],["dip",47,16,"CD4518 #2"],["dip",56,16,"CD4518 #1"]]],
+["Board 2: Drivers for MM tens, MM units, SS tens",drv("MM tens","MM units","SS tens")],
+["Board 3: Drivers for SS units, CS tens, CS units",drv("SS units","CS tens","CS units")],
+["Board 4: Control + power",[["dip",3,8,"NE555"],["blk",8,14,"timing parts, see list","pass"],["dip",17,14,"74HC14"],["dip",26,14,"74HC08"],["dip",35,14,"74HC32"],["dip",44,14,"74HC74"],["blk",53,58,"Buttons B, C","btn"],["blk",59,63,"LEDs","btn"]]]];
+var BANK="<li><b>The green bank:</b> 7 resistors, one per column, each standing across the center gap: top leg in row g, bottom leg in row d of the same column. A bank touches neither +5 V nor GND.</li><li><b>Top of each resistor:</b> short jumper from the CD4511 output with the same letter. The outputs f, g, a, b, c, d, e sit in the chip’s top row in the same left-to-right order as the bank.</li><li><b>Bottom of each resistor:</b> one wire to the display pin whose number is printed under it (9, 10, 7, 6, 4, 2, 1) on Board 1.</li>";
+var DRV="<li><b>Every CD4511:</b> pins 16, 3, 4 to +5 V; pins 8, 5 to GND; 0.1 µF across pins 16 and 8. Inputs A, B, C, D (pins 7, 1, 2, 6) ← Q0–Q3 of its counter on Board 1. On the two tens-of-minutes/seconds digits, Q3 never goes high, but still wire it so input D doesn’t float.</li>";
+var N=["<b>What goes here:</b> 6 displays and 3 CD4518 chips. The small rotated text on every pin names its signal. The colon dots are just a gap, because there are no colon LEDs in the parts list.<ul><li><b>Every display:</b> pins in rows h and d (see section 5). Jumper pin 3 (bottom row, labeled GND) to the blue GND rail. Pin 5 (DP) stays empty. Pins 7, 6, 4, 2, 1, 9, 10 (segments A–G) each take one wire from the bottom of that digit’s resistor bank on Board 2 or 3. There are no resistors on this board.</li><li><b>Every CD4518:</b> pin 16 to +5 V, pin 8 to GND, 0.1 µF across them. Pin 9 (CLOCK B) to GND and pin 10 (ENABLE B) ← pin 6 (Q3 A) on all three.</li><li><b>#1 (cols 56–63, CS):</b> pin 1 ← CLK_G from Board 4; pin 2 → +5 V; pins 7 and 15 ← RESET; pin 14 (Q3 B) → #2 pin 2.</li><li><b>#2 (cols 47–54, SS):</b> pin 1 → GND; pin 2 ← #1 pin 14; pin 7 ← RESET; pin 15 ← 74HC32 pin 3; pins 12, 13 (Q1 B, Q2 B) → 74HC08 pins 4, 5; pin 13 also → #3 pin 2.</li><li><b>#3 (cols 38–45, MM):</b> pin 1 → GND; pin 2 ← #2 pin 13; pin 7 ← RESET; pin 15 ← 74HC32 pin 6; pins 12, 13 → 74HC08 pins 9, 10.</li></ul>",
+"<b>Digits here:</b> left chip = MM tens (counter #3 B, display cols 2–6); middle = MM units (#3 A, cols 7–11); right = SS tens (#2 B, cols 14–18).<ul>"+DRV+BANK+"</ul>",
+"<b>Digits here:</b> left chip = SS units (counter #2 A, display cols 19–23); middle = CS tens (#1 B, cols 26–30); right = CS units (#1 A, cols 31–35).<ul>"+DRV+BANK+"</ul>",
+"<b>What goes here:</b><ul><li><b>Power:</b> USB breakout + and − into this board’s rails; long jumpers carry them to Boards 1–3.</li><li><b>NE555 (cols 3–6):</b> pin 8 to +5 V, pin 1 to GND, pin 4 to +5 V, 0.1 µF from pin 5 to GND, jumper pin 2 to pin 6. 1 µF: + leg in pin 6’s column, − leg to GND.</li><li><b>Timing network (green block, cols 8–14, top half):</b> R1 1 kΩ from the +5 V rail to col 8, jumper col 8 to pin 7. R2 4.7 kΩ from col 8 to col 10. Trimpot pins in cols 10, 11, 12: jumper col 11 (middle pin) to 555 pin 6. Leave col 12 empty.</li><li><b>555 output:</b> pin 3 → 74HC14 pin 1, with a 1 kΩ from that wire to +5 V.</li><li><b>Every other chip:</b> VCC pin (top-left) to +5 V, GND pin (bottom-right) to GND, 0.1 µF across them. Pins labeled GND are unused inputs tied low. Pins labeled nc stay empty.</li><li><b>Button B (cols 53–55):</b> straddles the gap. One contact to GND, the other to a node with 100 kΩ to +5 V, 0.1 µF to GND and a jumper to 74HC14 pin 3.</li><li><b>Button C (cols 56–58):</b> straddles the gap. One contact to +5 V, the other is the reset node: 1 µF from +5 V, 100 kΩ to GND, jumper to 74HC14 pin 5.</li><li><b>LEDs (cols 59–63):</b> 74HC74 pin 5 → 330 Ω → green LED long leg, short leg to GND. 74HC74 pin 6 → 330 Ω → red LED long leg, short leg to GND.</li></ul>"];
+var h="";B.forEach(function(b,i){h+='<div class="board"><b>'+b[0]+'</b><div class="scroll">'+board(b[1])+'</div><div class="bn">'+N[i]+'</div></div>'});
+document.getElementById("boards").innerHTML=h;
+
+var C=[
+["NE555P: 100 Hz clock","B4",[["GND","GND"],["TRIG","tie to pin 6"],["OUT","1k to +5V, then 74HC14 pin 1"],["RESET","+5V"],["CTRL","0.1µF to GND"],["THR","tie to pin 2; 1µF (+) here, (−) GND"],["DIS","R1 1k to +5V; R2 4.7k + trimpot to pin 6"],["VCC","+5V"]]],
+["74HC14: Schmitt inverters","B4",[["1A","555 pin 3"],["1Y","74HC08 pin 1"],["2A","button B node"],["2Y","74HC74 pin 3"],["3A","RST_NODE"],["3Y","/RESET: 74HC74 pin 1, 74HC14 pin 9"],["GND","GND"],["4Y","RESET: 74HC32 pins 1, 4 + counters"],["4A","/RESET (pin 6)"],["5Y","open"],["5A","GND"],["6Y","open"],["6A","GND"],["VCC","+5V"]]],
+["74HC08: AND gates","B4",[["1A","74HC14 pin 2"],["1B","RUN (74HC74 pin 5)"],["1Y","CLK_G to CD4518 #1 pin 1"],["2A","SS tens Q1 (#2 pin 12)"],["2B","SS tens Q2 (#2 pin 13)"],["2Y","74HC32 pin 2"],["GND","GND"],["3Y","74HC32 pin 5"],["3A","MM tens Q1 (#3 pin 12)"],["3B","MM tens Q2 (#3 pin 13)"],["4Y","open"],["4A","GND"],["4B","GND"],["VCC","+5V"]]],
+["74HC32: OR gates","B4",[["1A","RESET"],["1B","74HC08 pin 6"],["1Y","SS tens RESET (#2 pin 15)"],["2A","RESET"],["2B","74HC08 pin 8"],["2Y","MM tens RESET (#3 pin 15)"],["GND","GND"],["3Y","open"],["3A","GND"],["3B","GND"],["4Y","open"],["4A","GND"],["4B","GND"],["VCC","+5V"]]],
+["74HC74: start/stop","B4",[["1CLR","/RESET (74HC14 pin 6)"],["1D","tie to pin 6"],["1CLK","74HC14 pin 4"],["1PRE","+5V"],["1Q","RUN: 74HC08 pin 2; 330Ω → green LED"],["1/Q","pin 2; 330Ω → red LED"],["GND","GND"],["2/Q","open"],["2Q","open"],["2PRE","+5V"],["2CLK","GND"],["2D","GND"],["2CLR","+5V"],["VCC","+5V"]]],
+["CD4518: dual BCD up counter","B1, 3 chips",[["CLOCK A","see section 6"],["ENABLE A","see section 6"],["Q0 A","→ units 4511 pin 7"],["Q1 A","→ units 4511 pin 1"],["Q2 A","→ units 4511 pin 2"],["Q3 A","→ units 4511 pin 6; → pin 10"],["RESET A","RESET"],["GND","GND"],["CLOCK B","GND"],["ENABLE B","← pin 6 (Q3 A)"],["Q0 B","→ tens 4511 pin 7"],["Q1 B","→ tens 4511 pin 1"],["Q2 B","→ tens 4511 pin 2"],["Q3 B","→ tens 4511 pin 6"],["RESET B","see section 6"],["VCC","+5V"]]],
+["CD4511: BCD to 7-segment","B2–B3, 3 per board",[["B","Q1"],["C","Q2"],["/LT","+5V"],["/BI","+5V"],["LE","GND"],["D","Q3"],["A","Q0"],["GND","GND"],["e","330Ω → display pin 1"],["d","330Ω → display pin 2"],["c","330Ω → display pin 4"],["b","330Ω → display pin 6"],["a","330Ω → display pin 7"],["g","330Ω → display pin 10"],["f","330Ω → display pin 9"],["VCC","+5V"]]]];
+var o="";C.forEach(function(c){var n=c[2].length,k=n/2,T="",Bm="";
+function cell(i,top){var p=c[2][i-1],nm='<b>'+p[0]+'</b>',nt='<span>'+p[1]+'</span>',nu='<i>'+i+'</i>';
+return '<div class="pc'+(top?' t':'')+'">'+(top?nt+nm+nu:nu+nm+nt)+'</div>'}
+for(var j=0;j<k;j++){T+=cell(n-j,1);Bm+=cell(j+1,0)}
+o+='<div class="chip"><h3>'+c[0]+' <span>'+c[1]+'</span></h3><div class="scroll"><div class="hc" style="--k:'+k+'">'+T+'<div class="body">'+c[0].split(":")[0]+'</div>'+Bm+'</div></div></div>'});
+document.getElementById("chips").innerHTML=o;
+</script></body></html>
